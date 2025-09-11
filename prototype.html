@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Intelligence Center v6.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.5.0/dist/Recharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0B;
+            color: #F3F4F6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            padding: 24px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #111113 0%, #1A1A1D 100%);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .executive-brief {
+            grid-column: span 6;
+        }
+
+        .ai-tracker {
+            grid-column: span 6;
+        }
+
+        .gaming-pulse {
+            grid-column: span 6;
+        }
+
+        .crypto-monitor {
+            grid-column: span 6;
+        }
+
+        .content-engine {
+            grid-column: span 12;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #F3F4F6;
+            margin-bottom: 4px;
+        }
+
+        .metric-change {
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .positive {
+            color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .negative {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .neutral {
+            color: #9CA3AF;
+            background: rgba(156, 163, 175, 0.1);
+        }
+
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .weather-widget {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .weather-main {
+            flex: 1;
+        }
+
+        .weather-temp {
+            font-size: 48px;
+            font-weight: 700;
+            color: #F3F4F6;
+        }
+
+        .weather-condition {
+            font-size: 16px;
+            color: #9CA3AF;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid #6366F1;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .calendar-time {
+            font-size: 12px;
+            color: #6366F1;
+            font-weight: 600;
+        }
+
+        .calendar-title {
+            font-size: 14px;
+            color: #F3F4F6;
+            margin-top: 4px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #F3F4F6;
+            margin-bottom: 12px;
+        }
+
+        .insight-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #D1D5DB;
+        }
+
+        .content-suggestion {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .linkedin-badge {
+            background: rgba(10, 102, 194, 0.2);
+            color: #0A66C2;
+        }
+
+        .twitter-badge {
+            background: rgba(29, 155, 240, 0.2);
+            color: #1D9BF0;
+        }
+
+        .youtube-badge {
+            background: rgba(255, 0, 0, 0.2);
+            color: #FF0000;
+        }
+
+        .loading-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .time-display {
+            font-size: 36px;
+            font-weight: 700;
+            color: #F3F4F6;
+            margin-bottom: 8px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            color: #9CA3AF;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .executive-brief,
+            .ai-tracker,
+            .gaming-pulse,
+            .crypto-monitor {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .dashboard {
+                padding: 16px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .executive-brief,
+            .ai-tracker,
+            .gaming-pulse,
+            .crypto-monitor,
+            .content-engine {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock Data Generator
+        const generateMockData = () => ({
+            marketData: {
+                sp500: { value: 4521.32, change: 1.2, price: "$4,521.32" },
+                nasdaq: { value: 14123.45, change: 1.8, price: "$14,123.45" },
+                btc: { value: 111245, change: 3.4, price: "$111,245" },
+                eth: { value: 4314, change: 2.1, price: "$4,314" },
+                fedRate: { value: 3.50, change: 0, price: "3.50%" },
+                cpi: { value: 2.4, change: -0.1, price: "2.4%" }
+            },
+            weather: {
+                temp: 72,
+                condition: "Partly Cloudy",
+                location: "Rancho Santa Fe, CA",
+                forecast: [
+                    { day: "Today", high: 75, low: 62 },
+                    { day: "Tomorrow", high: 78, low: 64 },
+                    { day: "Friday", high: 73, low: 61 }
+                ]
+            },
+            calendar: [
+                { time: "9:00 AM", title: "Team Standup", type: "meeting" },
+                { time: "11:30 AM", title: "Investor Call - Series B Discussion", type: "important" },
+                { time: "2:00 PM", title: "Product Review - AI Features", type: "meeting" }
+            ],
+            aiMetrics: {
+                quarterlyFunding: "$73.6B",
+                topCompanies: ["OpenAI", "Anthropic", "Mistral", "Cohere", "Scale AI"],
+                aiTokens: {
+                    TAO: { price: "$512.45", change: 5.2 },
+                    RENDER: { price: "$8.73", change: 3.1 },
+                    FET: { price: "$1.82", change: 4.7 }
+                }
+            },
+            gamingData: {
+                totalRevenue: "$188.8B",
+                platforms: {
+                    mobile: { revenue: "$103B", growth: 2.9 },
+                    console: { revenue: "$45.9B", growth: 5.5 },
+                    pc: { revenue: "$39.9B", growth: 2.5 }
+                },
+                trending: ["Helldivers 2", "Palworld", "Balatro", "Last Epoch"]
+            },
+            cryptoData: {
+                btcEtfFlow: "+$521M",
+                defiTvl: "$198.3B",
+                stablecoins: "$157.2B",
+                layer2Tvl: "$42.1B"
+            },
+            insights: [
+                "Fed rate expectations stabilizing around 3.25-3.50% for 2025, creating favorable conditions for risk assets",
+                "AI investment momentum continues with 57.9% of global VC dollars, watch for spillover into AI crypto tokens",
+                "Gaming sector shows platform divergence: console growth accelerating while mobile matures"
+            ],
+            contentSuggestions: {
+                linkedin: {
+                    headline: "The AI Supercycle: Why 2025 is Different",
+                    angle: "Professional insights on AI investment trends and enterprise adoption",
+                    optimalTime: "10:00 AM PST"
+                },
+                twitter: {
+                    headline: "Bitcoin ETF flows hit $500M+ daily",
+                    thread: ["Institutional adoption accelerating", "Compare to gold ETF launch", "What this means for 2025"],
+                    hashtags: ["#Bitcoin", "#CryptoInstitutional", "#ETF"]
+                }
+            }
+        });
+
+        // Main Dashboard Component
+        function Dashboard() {
+            const [data, setData] = useState(generateMockData());
+            const [currentTime, setCurrentTime] = useState(new Date());
+
+            useEffect(() => {
+                // Update time every second
+                const timeInterval = setInterval(() => {
+                    setCurrentTime(new Date());
+                }, 1000);
+
+                // Update data every 30 seconds
+                const dataInterval = setInterval(() => {
+                    setData(generateMockData());
+                }, 30000);
+
+                return () => {
+                    clearInterval(timeInterval);
+                    clearInterval(dataInterval);
+                };
+            }, []);
+
+            const getGreeting = () => {
+                const hour = currentTime.getHours();
+                if (hour < 12) return "Good morning, Ryan";
+                if (hour < 17) return "Good afternoon, Ryan";
+                return "Good evening, Ryan";
+            };
+
+            const formatTime = () => {
+                return currentTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            };
+
+            return (
+                <div className="dashboard">
+                    <div className="dashboard-grid">
+                        {/* Executive Brief */}
+                        <div className="card executive-brief">
+                            <div className="section-title">
+                                <lucide-icon name="brain"></lucide-icon>
+                                Executive Brief
+                            </div>
+                            
+                            <div className="time-display">{formatTime()}</div>
+                            <div className="greeting">{getGreeting()}</div>
+                            
+                            <div className="weather-widget">
+                                <div className="weather-main">
+                                    <div className="weather-temp">{data.weather.temp}°F</div>
+                                    <div className="weather-condition">{data.weather.condition}</div>
+                                    <div className="weather-condition">{data.weather.location}</div>
+                                </div>
+                            </div>
+
+                            <div className="metrics-row">
+                                <MetricCard 
+                                    label="S&P 500"
+                                    value={data.marketData.sp500.price}
+                                    change={data.marketData.sp500.change}
+                                />
+                                <MetricCard 
+                                    label="NASDAQ"
+                                    value={data.marketData.nasdaq.price}
+                                    change={data.marketData.nasdaq.change}
+                                />
+                                <MetricCard 
+                                    label="Bitcoin"
+                                    value={data.marketData.btc.price}
+                                    change={data.marketData.btc.change}
+                                />
+                                <MetricCard 
+                                    label="Fed Rate"
+                                    value={data.marketData.fedRate.price}
+                                    change={data.marketData.fedRate.change}
+                                />
+                            </div>
+
+                            <div className="section-title" style={{marginTop: '20px'}}>
+                                <lucide-icon name="calendar"></lucide-icon>
+                                Today's Schedule
+                            </div>
+                            {data.calendar.map((item, index) => (
+                                <div key={index} className="calendar-item">
+                                    <div className="calendar-time">{item.time}</div>
+                                    <div className="calendar-title">{item.title}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* AI Tracker */}
+                        <div className="card ai-tracker">
+                            <div className="section-title">
+                                <lucide-icon name="sparkles"></lucide-icon>
+                                AI Momentum Tracker
+                            </div>
+                            
+                            <div className="metric-card">
+                                <div className="metric-label">Q1 2025 AI Funding</div>
+                                <div className="metric-value">{data.aiMetrics.quarterlyFunding}</div>
+                                <div className="metric-change positive">+57.9% of global VC</div>
+                            </div>
+
+                            <div className="metric-card">
+                                <div className="metric-label">Top Funded This Week</div>
+                                {data.aiMetrics.topCompanies.map((company, i) => (
+                                    <div key={i} style={{padding: '4px 0', color: '#D1D5DB'}}>
+                                        {i + 1}. {company}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="metric-card">
+                                <div className="metric-label">AI Crypto Tokens</div>
+                                {Object.entries(data.aiMetrics.aiTokens).map(([token, info]) => (
+                                    <div key={token} style={{display: 'flex', justifyContent: 'space-between', padding: '4px 0'}}>
+                                        <span>{token}</span>
+                                        <span className={info.change > 0 ? 'positive' : 'negative'}>
+                                            {info.price} ({info.change > 0 ? '+' : ''}{info.change}%)
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Gaming Pulse */}
+                        <div className="card gaming-pulse">
+                            <div className="section-title">
+                                <lucide-icon name="gamepad-2"></lucide-icon>
+                                Gaming & Creator Economy
+                            </div>
+                            
+                            <div className="metric-card">
+                                <div className="metric-label">Global Gaming Market</div>
+                                <div className="metric-value">{data.gamingData.totalRevenue}</div>
+                                <div className="metric-change positive">+3.4% YoY</div>
+                            </div>
+
+                            <div className="metric-card">
+                                <div className="metric-label">Platform Revenue</div>
+                                {Object.entries(data.gamingData.platforms).map(([platform, info]) => (
+                                    <div key={platform} style={{display: 'flex', justifyContent: 'space-between', padding: '4px 0'}}>
+                                        <span style={{textTransform: 'capitalize'}}>{platform}</span>
+                                        <span className="positive">
+                                            {info.revenue} (+{info.growth}%)
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="metric-card">
+                                <div className="metric-label">Trending Games</div>
+                                {data.gamingData.trending.map((game, i) => (
+                                    <div key={i} style={{padding: '4px 0', color: '#D1D5DB'}}>
+                                        • {game}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Crypto Monitor */}
+                        <div className="card crypto-monitor">
+                            <div className="section-title">
+                                <lucide-icon name="trending-up"></lucide-icon>
+                                Crypto & DeFi Intelligence
+                            </div>
+                            
+                            <div className="metrics-row">
+                                <MetricCard 
+                                    label="BTC ETF Daily Flow"
+                                    value={data.cryptoData.btcEtfFlow}
+                                    change={12.3}
+                                />
+                                <MetricCard 
+                                    label="DeFi TVL"
+                                    value={data.cryptoData.defiTvl}
+                                    change={2.1}
+                                />
+                                <MetricCard 
+                                    label="Stablecoins"
+                                    value={data.cryptoData.stablecoins}
+                                    change={0.8}
+                                />
+                                <MetricCard 
+                                    label="Bitcoin L2 TVL"
+                                    value={data.cryptoData.layer2Tvl}
+                                    change={8.7}
+                                />
+                            </div>
+
+                            <div className="metric-card">
+                                <div className="metric-label">Institutional Signals</div>
+                                <div style={{padding: '8px 0', color: '#10B981'}}>
+                                    ✓ MicroStrategy added 15,000 BTC
+                                </div>
+                                <div style={{padding: '8px 0', color: '#10B981'}}>
+                                    ✓ BlackRock IBIT seeing record inflows
+                                </div>
+                                <div style={{padding: '8px 0', color: '#F59E0B'}}>
+                                    ⚡ Grayscale outflows stabilizing
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content Engine */}
+                        <div className="card content-engine">
+                            <div className="section-title">
+                                <lucide-icon name="lightbulb"></lucide-icon>
+                                Content Intelligence Engine
+                            </div>
+
+                            <div className="insight-card">
+                                <div className="insight-title">Today's Key Narratives</div>
+                                <div className="insight-content">
+                                    {data.insights.map((insight, i) => (
+                                        <div key={i} style={{marginBottom: '12px'}}>
+                                            {i + 1}. {insight}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="content-suggestion">
+                                <div className="suggestion-card">
+                                    <div className="platform-badge linkedin-badge">
+                                        <lucide-icon name="linkedin" size={16}></lucide-icon>
+                                        LinkedIn Post
+                                    </div>
+                                    <div style={{fontWeight: 600, marginBottom: '8px'}}>
+                                        {data.contentSuggestions.linkedin.headline}
+                                    </div>
+                                    <div style={{fontSize: '14px', color: '#9CA3AF', marginBottom: '8px'}}>
+                                        {data.contentSuggestions.linkedin.angle}
+                                    </div>
+                                    <div style={{fontSize: '12px', color: '#6366F1'}}>
+                                        Optimal time: {data.contentSuggestions.linkedin.optimalTime}
+                                    </div>
+                                </div>
+
+                                <div className="suggestion-card">
+                                    <div className="platform-badge twitter-badge">
+                                        <lucide-icon name="twitter" size={16}></lucide-icon>
+                                        X/Twitter Thread
+                                    </div>
+                                    <div style={{fontWeight: 600, marginBottom: '8px'}}>
+                                        {data.contentSuggestions.twitter.headline}
+                                    </div>
+                                    {data.contentSuggestions.twitter.thread.map((point, i) => (
+                                        <div key={i} style={{fontSize: '14px', color: '#9CA3AF', marginBottom: '4px'}}>
+                                            • {point}
+                                        </div>
+                                    ))}
+                                    <div style={{fontSize: '12px', color: '#1D9BF0', marginTop: '8px'}}>
+                                        {data.contentSuggestions.twitter.hashtags.join(' ')}
+                                    </div>
+                                </div>
+
+                                <div className="suggestion-card">
+                                    <div className="platform-badge youtube-badge">
+                                        <lucide-icon name="youtube" size={16}></lucide-icon>
+                                        Video Topic
+                                    </div>
+                                    <div style={{fontWeight: 600, marginBottom: '8px'}}>
+                                        Weekly Market Wrap: AI, Gaming & Crypto Convergence
+                                    </div>
+                                    <div style={{fontSize: '14px', color: '#9CA3AF'}}>
+                                        • AI funding hitting record highs<br/>
+                                        • Console gaming resurgence<br/>
+                                        • Institutional crypto adoption accelerating
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Metric Card Component
+        function MetricCard({ label, value, change }) {
+            const changeClass = change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral';
+            const changeSymbol = change > 0 ? '↑' : change < 0 ? '↓' : '→';
+            
+            return (
+                <div className="metric-card">
+                    <div className="metric-label">{label}</div>
+                    <div className="metric-value">{value}</div>
+                    <div className={`metric-change ${changeClass}`}>
+                        {changeSymbol} {Math.abs(change)}%
+                    </div>
+                </div>
+            );
+        }
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Render the app
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>

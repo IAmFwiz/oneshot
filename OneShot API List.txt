@@ -1,0 +1,23 @@
+[ ] Google Gemini API Key: For the Predictive Insights Engine.
+
+[ ] Kalshi API Key: For market and portfolio data.
+
+[ ] Polymarket API Credentials: L1 Private Key and generated L2 API Key/Secret/Passphrase.
+
+[ ] X.com API Bearer Token (Optional): For the expert content feed.
+
+[ ] SportsData.io API Key: For NFL and CFB sports data.
+
+[ ] Self-Hosted Server: A machine with Docker and Docker Compose installed.
+
+[ ] Tailscale Account: For secure remote access.
+
+
+Get API keys from: https://console.anthropic.com or https://platform.openai.com
+Apply for developer account at: https://developer.twitter.com
+You'll need "Elevated" access for full functionality
+Required OAuth 2.0 scopes: tweet.read, tweet.write, users.read, offline.access
+Apply at: https://developer.linkedin.com
+Basic Consumer API access initially
+Consider applying for LinkedIn Marketing Developer Program for analytics (this is a longer process)
+Required scopes: w_member_social, r_liteprofile

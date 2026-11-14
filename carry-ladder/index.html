@@ -326,6 +326,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
       <a href="#classes" data-v="classes">Classes</a>
       <a href="#calendar" data-v="calendar">Calendar</a>
       <a href="#standards" data-v="standards">Standards</a>
+      <a href="#buy" data-v="buy">Buying Guide</a>
       <a href="#budget" data-v="budget">Budget</a>
       <a href="#rules" data-v="rules">Carry Rules</a>
       <a href="#places" data-v="places">Places</a>
@@ -340,6 +341,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
     <section class="view" id="v-classes" hidden></section>
     <section class="view" id="v-calendar" hidden></section>
     <section class="view" id="v-standards" hidden></section>
+    <section class="view" id="v-buy" hidden></section>
     <section class="view" id="v-budget" hidden></section>
     <section class="view" id="v-rules" hidden></section>
     <section class="view" id="v-places" hidden></section>
@@ -642,6 +644,9 @@ links:[['Gunsite 499','https://www.gunsite.com/classes/499-advanced-defensive-pi
 n9:{id:'n9',short:'Rangemaster',title:'Rangemaster Combative Pistol with Tom Givens',one:'Lakeland, FL, Mar 20–21, 2027, $495.',isNew:true,
 body:`<p>Givens' students have one of the best-documented records of real-world outcomes in the civilian training world. Two dense days of shooting, decision-making and mindset, graded against the Rangemaster standards in the Standards tab.</p>`,
 links:[['Rangemaster registration','https://rangemaster.corsizio.com/']]},
+n11:{id:'n11',short:'Home long gun',title:'Add a home-defense long gun',one:'A pump shotgun or featureless AR, bought after your Tier 2 standards are met.',isNew:true,
+body:`<p>A long gun is easier to shoot well under stress than a pistol and stays in the safe for the house. A pump 12-gauge is the cheapest reliable option; a featureless AR-15 is the most capable and the one carbine classes are built around. See the Buying Guide tab for what is legal in California and why.</p>`,
+links:[['Buying Guide','#buy']]},
 n10:{id:'n10',short:'Instructor track',title:'Optional: become an instructor',one:'Rangemaster Protective Pistolcraft ID: Nashville, Jul 19–23, 2027, $1,350.',isNew:true,
 body:`<p>Teaching forces you to understand the material at a different depth. Rangemaster's five-day instructor development course lists no prerequisites. Its Advanced and Master instructor courses require the earlier ones, and the Master course requires both Instructor and Advanced Instructor Development.</p>`,
 links:[['Rangemaster registration','https://rangemaster.corsizio.com/']]}
@@ -660,7 +665,7 @@ const TIERS = [
 {n:3,id:'t3',title:'Licensed',when:'Months 1–6, runs in parallel',img:'papers',steps:['s16','s17','s18','s19','s20'],
  gate:'Application filed in Tier 0.',exit:'CCW card in hand, carry rules memorized.',
  sum:'The Sheriff runs on its own clock: about 75 to 90 days from your appointment to conditional approval, then the course, then the card by mail.'},
-{n:4,id:'t4',title:'Immersion',when:'Months 3–9',img:'hero',steps:['s21','n1','s22','s23','s24','s25'],
+{n:4,id:'t4',title:'Immersion',when:'Months 3–9',img:'hero',steps:['s21','n1','s22','s23','s24','s25','n11'],
  gate:'Safe draw and Tier 2 standards met.',exit:'Gunsite Marksman · F.A.S.T. under 7.00 · Bill Drill under 3.50',
  sum:'Leave home to train. Immersion first, then modern instructors who grade you against published standards.'},
 {n:5,id:'t5',title:'Force on Force',when:'Months 9–15',img:'mats',steps:['s26','n2','n3','n4','n5'],
@@ -671,7 +676,7 @@ const TIERS = [
  sum:'Low light, advanced simulators, the hardest standards in the civilian world, and the option to teach. Then keep it: skill fades within weeks of stopping.'}
 ];
 
-const SEQ = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s16','s10','s11','s12','s13','s14','s17','s15','s18','s19','s20','s21','n1','s22','s23','s24','s25','n5','s26','n2','n3','n4','n6','n7','s27','n9','n8','s28','s29','s30','n10'];
+const SEQ = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s16','s10','s11','s12','s13','s14','s17','s15','s18','s19','s20','s21','n1','s22','s23','s24','s25','n11','n5','s26','n2','n3','n4','n6','n7','s27','n9','n8','s28','s29','s30','n10'];
 
 const COURSES = [
 {id:'pwg-first',name:'Handgun First Steps',by:'PWG Range',tier:0,where:'Poway',drive:'25 min',cost:99,costL:'$99',ammo:'Gun and ammo included',prereq:'None',sched:'Runs often; book online',note:'Three hours on rental guns. The community default for true beginners.',url:'https://www.pwgrange.com/class/handgun-first-steps/',verdict:['p-ok','Start here']},
@@ -708,7 +713,7 @@ t0:[['Firearm Safety Certificate',25,25],['CCW application + Livescan',128.2,128
 t1:[['Bedside quick-access + main safe',400,1500,'est.'],['Pistol, red dot, DROS, taxes',1200,1500,'est.'],['Holster, belt, 5 magazines',300,500],['1,000 practice + 100 carry rounds',400,550,'est.'],['DOJ-listed car lockbox',50,120,'est.']],
 t2:[['PWG Gold: join + 3 months',347,347],['PWG Defensive Handgun',199,199],['Private lessons ×3–4',300,600,'est.'],['Dry-fire tools (MantisX, DryFireMag…)',100,500,'est.'],['Practice ammo, ~2,400 rounds',850,1000,'est.'],['Law of Self Defense',90,90],['Stop the Bleed, tourniquet, kit',50,150,'est.'],['First match',20,20]],
 t3:[['16-hour CCW course',340,499],['Final Sheriff + DOJ fee',140.8,140.8]],
-t4:[['Gunsite 250 + Day Zero',2385,2385],['250 ammo, ~1,050 rounds',380,450,'est.'],['Arizona travel and lodging',700,1500,'est.'],['Modern Samurai AIWB + 700 rounds',860,900,'est.'],['Livermore travel',500,900,'est.'],['Tactical Hyve Essential Defense',750,750],['TacCon tuition + Dallas travel',900,1800,'est.'],['Grappling, 6 months',900,1500,'est.']],
+t4:[['Gunsite 250 + Day Zero',2385,2385],['Home long gun (pump or featureless AR)',450,1800,'est.'],['250 ammo, ~1,050 rounds',380,450,'est.'],['Arizona travel and lodging',700,1500,'est.'],['Modern Samurai AIWB + 700 rounds',860,900,'est.'],['Livermore travel',500,900,'est.'],['Tactical Hyve Essential Defense',750,750],['TacCon tuition + Dallas travel',900,1800,'est.'],['Grappling, 6 months',900,1500,'est.']],
 t5:[['ShivWorks ECQC + range fee',835,835],['ECQC ammo and travel',380,700,'est.'],['Tactical Hyve Force on Force',750,750],['MAG-20 + travel',1300,2000,'est.'],['Two-day trauma care',300,600,'est.']],
 t6:[['Gunsite 350 + ~1,300 rounds',2845,2950,'est.'],['Gunsite 499 + ~1,350 rounds',3070,3200,'est.'],['Two more Arizona trips',1400,3000,'est.'],['Gabe White + travel',1450,2150,'est.'],['Rangemaster Combative Pistol + travel',1300,2000,'est.'],['USPSA ×12 + ammo',1250,1350,'est.'],['Utah nonresident permit',90,90],['First renewal (course + fees)',419,469]]
 };
@@ -729,7 +734,7 @@ const LS = {
   get(k,d){try{const v=localStorage.getItem('cl:'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem('cl:'+k,JSON.stringify(v))}catch(e){}}
 };
-let ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},updatedAt:0}, LS.get('state',{}));
+let ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},buy:{},updatedAt:0}, LS.get('state',{}));
 const UI = {open:new Set(), cFilter:LS.get('cFilter','all'), cStatus:LS.get('cStatus','any'), hideDone:LS.get('hideDone',false), pFilter:LS.get('pFilter','all'), pQuery:'', zQuery:'', calAll:LS.get('calAll',false)};
 
 let remote = null, saveT = null, saving = false, pending = false;
@@ -766,13 +771,13 @@ async function connect(){
       const d = snap.exists ? snap.data() : null;
       if(first){
         first=false;
-        if(d && (d.updatedAt||0) > (ST.updatedAt||0)){ ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender(); }
+        if(d && (d.updatedAt||0) > (ST.updatedAt||0)){ ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},buy:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender(); }
         else if(ST.updatedAt>0){ flush(); }
         setSync('cloud','Saved to your account');
         return;
       }
       if(d && !snap.metadata.hasPendingWrites && (d.updatedAt||0) > (ST.updatedAt||0)){
-        ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender();
+        ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},buy:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender();
       }
     }, err=>{ clearTimeout(timer); remote=null; setSync('','Saved on this device'); });
   }catch(e){}
@@ -854,7 +859,7 @@ function stepHTML(id){
   const s=STEPS[id]; if(!s) return '';
   const open=UI.open.has(id);
   const facts = s.facts ? `<dl class="facts">${s.facts.map(f=>`<dt>${esc(f[0])}</dt><dd>${f[1]}</dd>`).join('')}</dl>` : '';
-  const links = s.links ? `<div class="links">${s.links.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])} ↗</a>`).join('')}</div>` : '';
+  const links = s.links ? `<div class="links">${s.links.map(l=>`<a href="${l[1]}" ${l[1][0]==="#"?"":"target=\"_blank\" rel=\"noopener\""}>${esc(l[0])} ↗</a>`).join('')}</div>` : '';
   return `<div class="step ${ST.done[id]?'done':''} ${open?'open':''}" data-step="${id}">
     <input type="checkbox" class="check" id="c-${id}" data-id="${id}" ${ST.done[id]?'checked':''} aria-label="Mark done: ${esc(s.title)}">
     <div class="st-main"><button class="st-head" aria-expanded="${open}"><span><span class="st-title">${esc(s.title)}${s.isNew?'<span class="pill p-sig new">New</span>':''}</span><span class="st-one">${s.one}</span></span>${chev}</button>
@@ -1029,8 +1034,8 @@ function renderPlaces(){
 }
 
 /* ---------- ROUTER ---------- */
-const VIEWS=['overview','path','classes','calendar','standards','budget','rules','places'];
-const R={overview:renderOverview,path:renderPath,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,budget:renderBudget,rules:renderRules,places:renderPlaces};
+const VIEWS=['overview','path','classes','calendar','standards','buy','budget','rules','places'];
+const R={overview:renderOverview,path:renderPath,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,buy:renderBuy,budget:renderBudget,rules:renderRules,places:renderPlaces};
 let cur='overview';
 function updateHeader(){const n=ALL.filter(id=>ST.done[id]).length;document.getElementById('hcount').innerHTML=`<b>${n}</b>/${ALL.length} steps`;}
 function rerender(){
@@ -1050,4 +1055,108 @@ window.addEventListener('hashchange',show);
 cur=null; show();
 setSync('', 'This device');
 connect();
+
+/* ---------- BUYING GUIDE ---------- */
+function buyData(){ return {
+handguns:[
+ {id:'p365x',name:'Sig P365 X-Macro (CA SKU)',role:'Carry · first choice',status:['p-ok','On roster'],price:'~$700–800',
+  why:'17-round-class grip cut to 10 for California, optic-ready, built-in compensator. Easiest high-performing appendix carry gun to hide. The P365 XL is the slimmer alternative.',
+  watch:'Buy the exact "CA" SKU. Roster status is per model number, not per family.'},
+ {id:'shieldplus',name:'S&W M&P9 Shield Plus (CA)',role:'Carry · budget',status:['p-ok','Added Sept 3, 2026'],price:'Check',
+  why:'One of 20 Smith & Wesson models added in the Boland v. Bonta batch. Thin, reliable, good trigger, optic-ready versions exist.',
+  watch:'Confirm the optic-ready (OR) variant\'s exact SKU on the DOJ roster.'},
+ {id:'g43x',name:'Glock 43X CA',role:'Carry · if you want a Glock',status:['p-warn','Added Sept 29, 2026'],price:'Check',
+  why:'The only new Glock a California dealer can sell since AB 1127. Rebuilt so it is not flagged as "convertible." Shipping was expected around December 2026.',
+  watch:'Every other Glock on the roster is flagged and can\'t be sold new. Used Glocks still transfer through a private-party sale.'},
+ {id:'hellcat',name:'Springfield Hellcat Pro or Echelon 4.0C (CA)',role:'Carry / home',status:['p-ok','On roster (verify)'],price:'Check',
+  why:'Hellcat Pro is a micro-compact with 15+ capacity elsewhere, 10 here. The Echelon is a modular, optic-first full-size with a strong reputation.',
+  watch:'Verify the exact CA model number before you go to the counter.'},
+ {id:'vp9',name:'HK VP9 (CA)',role:'Home defense / range',status:['p-ok','On roster'],price:'Check',
+  why:'Full-size, excellent ergonomics and trigger, more forgiving than a micro for learning. A strong pick for a second, nightstand-safe gun.',
+  watch:'Too big for most people to carry concealed comfortably.'},
+ {id:'mpm2',name:'S&W M&P9 M2.0 full-size OR (CA)',role:'Home defense / classes',status:['p-ok','On roster'],price:'~$599',
+  why:'Inexpensive, durable, optic-ready, and common in classes, so parts and holsters are everywhere.',
+  watch:'One retailer lists the CA SKU; confirm on the DOJ roster.'},
+ {id:'pdp',name:'Walther PDP (CA)',role:'Home defense / carry',status:['p-warn','Verify on roster'],price:'Check',
+  why:'Best-in-class trigger and grip texture; sold in California in 4" compact-grip and 4.5" full-size configurations per retailers.',
+  watch:'Moderate confidence only: no DOJ roster entry was confirmed in this check.'}
+],
+avoid:[
+ ['Sig P320 (all variants)','Legal to buy if on the roster, but ShivWorks, Gabe White and Modern Samurai ban it in class after reports of unintended discharges. It would lock you out of Tiers 5 and 6.'],
+ ['New Glocks other than the 43X CA','AB 1127 bars dealers from selling them new since July 1, 2026. A used one through a private-party transfer is still legal.'],
+ ['Off-roster guns at a premium','Possible through a private-party transfer of a used gun, often at a big markup. Not worth it for a first gun when good roster options exist.']
+],
+rifles:[
+ {id:'ar-feat',name:'Featureless AR-15 in 5.56',role:'Home defense / carbine classes',status:['p-ok','Legal configured'],price:'$900–1,800',
+  why:'The most capable and most trained-for rifle. "Featureless" means no pistol grip (a fin grip instead), no flash hider (a muzzle brake or compensator), a fixed stock, and no forward grip, so it can take a normal detachable 10-round magazine.',
+  watch:'Most California owners choose this over fixed-magazine builds because reloads stay fast. Buy it already configured from a California dealer.'},
+ {id:'ar-fixed',name:'Fixed-magazine AR-15',role:'Alternative',status:['p-ok','Legal configured'],price:'~$1,400 (e.g., Dark Storm DS-15 Typhoon)',
+  why:'Keeps the pistol grip and adjustable stock, but the magazine can\'t come out without opening the action. Reloading means splitting the upper.',
+  watch:'Ergonomics win, reloads lose. Fine for home defense where 10 rounds is the plan; poor for classes.'},
+ {id:'mini14',name:'Ruger Mini-14 Ranch',role:'Simple semi-auto',status:['p-ok','Legal as sold'],price:'Check',
+  why:'Traditional rifle stock and, on the standard non-threaded model, no flash hider, so it has none of the banned features and takes detachable 10-round magazines without modification.',
+  watch:'The "Tactical" Mini-14 with a flash hider or folding stock is an assault weapon in California. Buy the Ranch.'},
+ {id:'lever',name:'Lever action in .357 or .44 (Henry, Marlin)',role:'Home / truck / ranch',status:['p-ok','No AW rules'],price:'Check',
+  why:'Not semi-automatic, so the assault-weapon definitions don\'t apply. A .357 lever gun shares ammo with a revolver and is mild to shoot.',
+  watch:'Slower to reload than an AR; very few defensive classes are built around it.'},
+ {id:'bolt',name:'Bolt action (Tikka T3x, Ruger American)',role:'Hunting / precision',status:['p-ok','No AW rules'],price:'Check',
+  why:'For deer, long-range shooting, and learning wind and ballistics. No feature restrictions.',
+  watch:'California requires lead-free ammunition for all hunting.'}
+],
+shotguns:[
+ {id:'pump',name:'Pump: Mossberg 590 or Remington 870',role:'Home defense',status:['p-ok','No AW rules'],price:'$450–650',
+  why:'Reliable, cheap, devastating at indoor distances. The classic first home-defense long gun.',
+  watch:'Barrel must be at least 18 inches and overall length at least 26.'},
+ {id:'semi12',name:'Semi-auto: Beretta 1301 Tactical (standard stock)',role:'Home defense',status:['p-ok','Legal configured'],price:'Check',
+  why:'Faster and softer-shooting than a pump, tube-fed.',
+  watch:'A semi-auto shotgun is an assault weapon if it has a detachable magazine, or a folding or telescoping stock combined with a pistol grip, thumbhole or forward grip. Keep the standard stock and tube magazine.'}
+],
+banned:[
+ ['Magazines over 10 rounds','You can\'t buy, import or make them, CCW or not. Upheld en banc by the Ninth Circuit in Duncan (Mar 2025); Supreme Court petition pending.'],
+ ['Suppressors','Illegal to possess in California, even though federal law allows them with a tax stamp.'],
+ ['Short-barreled rifles and shotguns','Under 16" (rifle) or 18" (shotgun) barrels are banned.'],
+ ['Assault weapons not registered before the deadlines','Any semi-auto centerfire rifle with a detachable magazine and one banned feature, or one under 30" overall.'],
+ ['.50 BMG rifles','Banned for new acquisition.'],
+ ['Binary triggers and bump stocks','Banned as multiburst trigger activators.'],
+ ['Out-of-state ammo you bring in yourself','Every ammo purchase goes through a California vendor with a background check.']
+],
+coming:[
+ ['Jan 1, 2026 (in effect)','Loose barrels must be bought in person through a dealer (SB 704).'],
+ ['Jul 1, 2026 (in effect)','No new sales of Glock-pattern "convertible" pistols (AB 1127). Glock 43X CA is exempt.'],
+ ['Jan 1, 2027','The September 2026 package takes effect: 3D-printer blocking standards, a 10-year gun ban for serial-number crimes, new restraining-order rules.'],
+ ['Jul 1, 2027','Barrel purchases also need a background check (SB 704, per the Attorney General\'s bulletin; some secondary sources say 2026).'],
+ ['2028–2029','SB 948: a four-hour safety class for new purchasers starting 2029; people moving in with guns need an FSC within 180 days starting 2028.'],
+ ['Pending','Miller v. Bonta (assault weapons, 9th Cir. panel), Duncan (magazines, SCOTUS petition), Boland (roster, injunction), U.S. v. California (Glock ban).']
+]}; }
+
+function buyCard(g){
+  const st=(ST.buy||{})[g.id]||'';
+  return `<article class="course ${st==='bought'?'st-done':''}" id="buy-${g.id}">
+    <div class="c-top"><div style="min-width:0"><div class="c-name">${esc(g.name)}</div><div class="c-by">${esc(g.role)}</div></div><div class="c-cost" style="font-size:17px">${esc(g.price)}</div></div>
+    <div class="tags"><span class="pill ${g.status[0]}">${esc(g.status[1])}</span></div>
+    <p class="c-note">${esc(g.why)}</p>
+    <dl class="facts"><dt>Watch</dt><dd>${esc(g.watch)}</dd></dl>
+    <div class="seg" style="grid-template-columns:repeat(3,1fr)" role="group" aria-label="Status">${[['','—'],['want','Want'],['bought','Bought']].map(s=>`<button data-s="${s[0]==='bought'?'done':s[0]}" data-buy="${g.id}|${s[0]}" aria-pressed="${st===s[0]}">${s[1]}</button>`).join('')}</div>
+  </article>`;
+}
+function renderBuy(){
+  const B=buyData(); const v=document.getElementById('v-buy');
+  const list=(rows)=>`<div class="card">${rows.map(r=>`<div class="zone"><span class="zone-name">${esc(r[0])}</span><span></span><span class="zone-note">${esc(r[1])}</span></div>`).join('')}</div>`;
+  const nWant=Object.values(ST.buy||{}).filter(x=>x==='want').length, nGot=Object.values(ST.buy||{}).filter(x=>x==='bought').length;
+  v.innerHTML = `<p class="lead">What you can actually buy new from a California dealer as of ${VERIFIED}, picked for the training path. Handguns must be on the DOJ roster by exact model number; rifles and shotguns have no roster but must avoid the assault-weapon features. Mark what you want and what you've bought.</p>
+  <div class="callout hot"><span class="eyebrow">Recommendation</span><p><strong>Buy one carry pistol first and train with only that gun through Tier 3.</strong> The Sig P365 X-Macro is the default. Add a pump shotgun or featureless AR for the house only after your Tier 2 standards are met and the safe has room. Every gun must be listed on your CCW to carry it, and each one costs 30 more qualification rounds.</p></div>
+  <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><span class="eyebrow">Want</span><span class="v">${nWant}</span><span class="s">on your list</span></div><div class="stat"><span class="eyebrow">Bought</span><span class="v">${nGot}</span><span class="s">owned</span></div><div class="stat"><span class="eyebrow">Limit</span><span class="v">3 / 30 days</span><span class="s">any firearms, CCW or not</span></div></div>
+  <div class="callout"><span class="eyebrow">At the counter, every time</span><p>FSC card (exempt once you hold a CCW) · age 21 · proof of residence · safe-handling demo · DROS $37.19 + 11% state excise + sales tax · 10-day wait, pick up within 30 days · the sale is recorded on video. Check any handgun's exact model number on the <a href="https://oag.ca.gov/firearms/certified-handguns/search" target="_blank" rel="noopener">DOJ roster</a> before you go.</p></div>
+  <h2 class="sec">Handguns</h2><div class="grid2">${B.handguns.map(buyCard).join('')}</div>
+  <h2 class="sec">Skip these</h2>${list(B.avoid)}
+  <h2 class="sec">Rifles</h2>
+  <div class="card"><div class="card-h"><h3>What makes a rifle an "assault weapon"</h3><span class="pill p-n">PC 30515</span></div>
+   <div class="acc-b" style="padding-top:12px"><p>A semi-automatic centerfire rifle is an assault weapon if it has a <strong>detachable magazine</strong> and <strong>any one</strong> of: a pistol grip that protrudes below the action, a thumbhole stock, a folding or telescoping stock, a grenade or flare launcher, a flash suppressor, or a forward pistol grip. It is also one if it has a fixed magazine holding more than 10 rounds, or an overall length under 30 inches. Two legal ways out: remove every feature (featureless), or lock the magazine so it can't come out without disassembling the action (fixed magazine).</p></div></div>
+  <div class="grid2">${B.rifles.map(buyCard).join('')}</div>
+  <h2 class="sec">Shotguns</h2><div class="grid2">${B.shotguns.map(buyCard).join('')}</div>
+  <h2 class="sec">Flat-out illegal</h2>${list(B.banned)}
+  <h2 class="sec">Changes coming</h2>${list(B.coming)}
+  <p class="foot">Confidence: high on the legal rules and the AB 1127 and Glock 43X facts; moderate on individual roster SKUs, which come from retailers and advocacy groups rather than the DOJ page itself. Roster status changes as Boland v. Bonta proceeds. Prices are retailer listings or blank where unverified.</p>`;
+  v.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{const [id,s]=b.dataset.buy.split('|');ST.buy=ST.buy||{};if(!s)delete ST.buy[id];else ST.buy[id]=s;commit(s?(s==='want'?'Added to your list':'Marked bought'):'Cleared');}));
+}
 </script>

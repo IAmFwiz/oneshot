@@ -1,0 +1,1053 @@
+<title>The Carry Ladder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: a range logbook in eight views. Sticky header with sync state and progress; photo-banded tiers on a ladder; cards for classes, a month-grouped calendar, drill logs with sparklines, and a budget ledger. */
+:root{
+  --bg:#E7E9E3;
+  --surface:#F6F7F3;
+  --surface-2:#DCE0D6;
+  --ink:#151915;
+  --muted:#596158;
+  --line:#CBD1C5;
+  --olive:#46582A;
+  --olive-soft:#D9E1CA;
+  --on-olive:#FFFFFF;
+  --signal:#C94E1B;
+  --signal-soft:#F5DCCF;
+  --ok:#2A7548; --ok-soft:#D7EBDD;
+  --warn:#8E5B00; --warn-soft:#F3E5C6;
+  --no:#A82920; --no-soft:#F4D9D5;
+  --photo-ink:#FFFFFF;
+  --photo-dim:rgba(255,255,255,.78);
+  --shade:rgba(10,13,10,.08);
+  --f-display:"Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D100D; --surface:#151915; --surface-2:#1D221C; --ink:#E4E8E0; --muted:#97A095; --line:#2A3029;
+    --olive:#A8C172; --olive-soft:#222B17; --on-olive:#10140B; --signal:#FF7C42; --signal-soft:#3A1D10;
+    --ok:#62C48C; --ok-soft:#14301F; --warn:#E0AC48; --warn-soft:#33270F; --no:#F07A6E; --no-soft:#3A1A17;
+    --shade:rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D100D; --surface:#151915; --surface-2:#1D221C; --ink:#E4E8E0; --muted:#97A095; --line:#2A3029;
+  --olive:#A8C172; --olive-soft:#222B17; --on-olive:#10140B; --signal:#FF7C42; --signal-soft:#3A1D10;
+  --ok:#62C48C; --ok-soft:#14301F; --warn:#E0AC48; --warn-soft:#33270F; --no:#F07A6E; --no-soft:#3A1A17;
+  --shade:rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:120px}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--olive);text-underline-offset:2px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:6px}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:saturate(1.3) blur(12px);-webkit-backdrop-filter:saturate(1.3) blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{padding-block:10px 0;display:flex;flex-direction:column;gap:8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mark{display:flex;align-items:center;gap:10px;min-width:0}
+.rungs{width:22px;height:26px;flex:none;color:var(--olive)}
+.wordmark{font-family:var(--f-display);font-weight:800;font-size:25px;letter-spacing:.02em;line-height:1;text-transform:uppercase;white-space:nowrap}
+.hstat{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.hstat b{color:var(--ink)}
+.sync{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:99px;background:var(--surface-2);font-size:11px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync.cloud i{background:var(--ok)}
+.sync.saving i{background:var(--warn)}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-inline:-4px}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--muted);font-weight:600;font-size:13.5px;padding:8px 10px 10px;border-bottom:2.5px solid transparent;white-space:nowrap}
+.nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--signal)}
+.nav a:hover{color:var(--ink)}
+
+main .wrap{padding-block:22px 64px}
+.view{display:flex;flex-direction:column;gap:18px}
+h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;margin:10px 0 -6px;text-wrap:balance}
+.lead{font-size:16px;max-width:66ch;margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mini{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Hero */
+.hero{position:relative;border-radius:18px;overflow:hidden;background:#20241c;min-height:300px;display:flex;align-items:flex-end}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,8,.05) 0%,rgba(8,10,8,.25) 40%,rgba(8,10,8,.86) 100%)}
+.hero-in{position:relative;z-index:1;padding:28px 22px 22px;display:flex;flex-direction:column;gap:8px;color:var(--photo-ink);max-width:720px}
+.hero .eyebrow{color:var(--photo-dim)}
+.hero h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(38px,7vw,64px);line-height:.92;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
+.hero p{margin:0;color:var(--photo-dim);font-size:15.5px;max-width:58ch}
+
+/* Stat strip */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stat{background:var(--surface);padding:12px 14px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.stat .v{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.05;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat .v.sm{font-size:19px;line-height:1.15;padding-top:4px}
+.stat .s{font-size:12px;color:var(--muted)}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Ladder graphic */
+.ladder{display:flex;flex-direction:column;gap:6px}
+.rung{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:inherit}
+.rung:hover{border-color:color-mix(in srgb,var(--olive) 45%,var(--line))}
+.rung .n{font-family:var(--f-display);font-weight:800;font-size:30px;line-height:1;color:var(--muted);text-align:center}
+.rung.cur{border-color:var(--signal);box-shadow:0 0 0 1px var(--signal) inset}
+.rung.cur .n{color:var(--signal)}
+.rung.done .n{color:var(--olive)}
+.rung .t{font-family:var(--f-display);font-weight:700;font-size:20px;text-transform:uppercase;line-height:1.05}
+.rung .w{font-size:12.5px;color:var(--muted)}
+.meter{height:6px;background:var(--surface-2);border-radius:6px;overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;width:0;background:var(--olive);border-radius:6px;transition:width .4s ease}
+.rung .pct{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;min-width:48px}
+
+/* Next moves */
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.moves{grid-template-columns:1fr}}
+.move{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.move .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal)}
+.move .h{font-weight:700;font-size:15px;line-height:1.3}
+.move .b{font-size:13.5px;color:var(--muted)}
+.move button{align-self:flex-start}
+
+.callout{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.callout.hot{border-color:color-mix(in srgb,var(--signal) 45%,var(--line))}
+.callout.hot .eyebrow{color:var(--signal)}
+.callout p{margin:0;max-width:70ch}
+
+/* Gantt */
+.gantt-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 4px 8px 12px;overflow-x:auto}
+.gantt-box svg{display:block;min-width:720px;width:100%;height:auto}
+.gantt-box text{font-family:var(--f-mono);fill:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);padding:6px 6px 0}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* Buttons and pills */
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--olive)}
+.btn.pri{background:var(--olive);border-color:var(--olive);color:var(--on-olive)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap;font-weight:600}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-no{background:var(--no-soft);color:var(--no)}
+.p-n{background:var(--surface-2);color:var(--muted)}
+.p-acc{background:var(--olive-soft);color:var(--olive)}
+.p-sig{background:var(--signal-soft);color:var(--signal)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tags .p-n.t{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-size:11.5px}
+
+/* Tiers */
+.tier{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tier-band{position:relative;height:clamp(150px,24vw,220px);background:#1d211b}
+.tier-band img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tier-band::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,10,8,.82) 0%,rgba(8,10,8,.45) 55%,rgba(8,10,8,.1) 100%)}
+.tier-band .lab{position:absolute;z-index:1;left:18px;right:18px;bottom:14px;color:var(--photo-ink);display:flex;flex-direction:column;gap:2px}
+.tier-band .lab .eyebrow{color:var(--photo-dim)}
+.tier-band .lab h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(28px,5vw,40px);line-height:.95;text-transform:uppercase}
+.tier-band .lab .when{font-size:13px;color:var(--photo-dim)}
+.tier-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.tier-meta>div{background:var(--surface);padding:10px 14px;min-width:0;font-size:13.5px}
+.tier-meta .eyebrow{display:block;margin-bottom:2px}
+@media (max-width:700px){.tier-meta{grid-template-columns:1fr}}
+.tier-sum{padding:12px 16px 4px;color:var(--muted);font-size:14px;max-width:70ch;margin:0}
+.tier-prog{display:flex;align-items:center;gap:10px;padding:8px 16px 4px}
+.tier-prog .meter{flex:1;margin:0}
+.tier-classes{padding:8px 16px 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-top:1px solid var(--line)}
+.chiplink{appearance:none;border:1px solid var(--line);background:var(--bg);padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+
+.step{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:11px 16px 11px 14px;border-top:1px solid color-mix(in srgb,var(--line) 65%,transparent)}
+.check{appearance:none;width:24px;height:24px;border-radius:7px;border:1.5px solid color-mix(in srgb,var(--muted) 70%,transparent);background:var(--surface);cursor:pointer;display:grid;place-items:center;margin-top:1px;flex:none}
+.check:checked{background:var(--olive);border-color:var(--olive)}
+.check:checked::after{content:"";width:6px;height:11px;border:solid var(--on-olive);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.st-head{appearance:none;border:0;background:transparent;padding:0;text-align:left;width:100%;cursor:pointer;display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.st-title{font-weight:600;font-size:15px;line-height:1.35}
+.st-title .new{margin-left:6px;vertical-align:2px}
+.step.done .st-title{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.st-one{font-size:13.5px;color:var(--muted);margin-top:2px;display:block}
+.chev{width:16px;height:16px;flex:none;margin-top:3px;transition:transform .2s ease;color:var(--muted)}
+.open>.st-main .chev,.acc.open .chev{transform:rotate(180deg)}
+.st-detail{margin-top:10px;font-size:14px;display:flex;flex-direction:column;gap:10px}
+.st-detail p{margin:0;max-width:68ch}
+.st-detail ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.facts{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:4px 14px;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px;margin:0}
+.facts dt{color:var(--muted);font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.facts dd{margin:0;min-width:0;font-variant-numeric:tabular-nums}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
+.note{width:100%;min-height:54px;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:8px 10px;font-size:13.5px;resize:vertical;color:var(--ink)}
+
+/* Toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:99px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;color:var(--ink)}
+.search::placeholder{color:var(--muted)}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none}
+.switch input{accent-color:var(--olive);width:16px;height:16px}
+
+/* Classes */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.course{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.course.st-booked{border-color:color-mix(in srgb,var(--signal) 55%,var(--line))}
+.course.st-done{opacity:.72}
+.c-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.c-name{font-weight:700;font-size:16px;line-height:1.25}
+.c-by{font-size:12.5px;color:var(--muted)}
+.c-cost{font-family:var(--f-display);font-weight:700;font-size:21px;white-space:nowrap;text-align:right;line-height:1}
+.c-cost small{display:block;font-family:var(--f-mono);font-weight:500;font-size:10.5px;color:var(--muted);margin-top:3px}
+.c-note{font-size:13.5px;margin:0}
+.dates{display:flex;flex-wrap:wrap;gap:5px}
+.date{font-family:var(--f-mono);font-size:11.5px;padding:3px 7px;border-radius:6px;background:var(--surface-2);font-variant-numeric:tabular-nums}
+.date.so{text-decoration:line-through;color:var(--muted)}
+.date.promo{background:var(--olive-soft);color:var(--olive)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface-2);border-radius:9px;padding:3px;gap:3px}
+.seg button{appearance:none;border:0;background:transparent;border-radius:7px;padding:6px 4px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px var(--shade),0 0 0 1px var(--line)}
+.seg button[data-s="booked"][aria-pressed="true"]{color:var(--signal)}
+.seg button[data-s="done"][aria-pressed="true"]{color:var(--ok)}
+.c-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;font-size:13px}
+
+/* Calendar */
+.month{display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.month h3{margin:0;padding:10px 14px;font-family:var(--f-display);font-weight:700;font-size:20px;text-transform:uppercase;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.ev{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:12px;padding:10px 14px;border-top:1px solid color-mix(in srgb,var(--line) 65%,transparent);align-items:start}
+.ev:first-of-type{border-top:0}
+.ev .d{font-family:var(--f-mono);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.35}
+.ev .d small{display:block;color:var(--muted);font-weight:500}
+.ev .what{font-weight:600;font-size:14.5px;line-height:1.3}
+.ev .where{font-size:12.5px;color:var(--muted)}
+.ev .side{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+@media (max-width:560px){.ev{grid-template-columns:70px minmax(0,1fr)}.ev .side{grid-column:2;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start}}
+
+/* Standards */
+.drill{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dr-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.dr-name{font-weight:700;font-size:16px}
+.dr-setup{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-top:2px}
+.pars{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:6px}
+.par{background:var(--surface-2);border-radius:9px;padding:7px 8px;min-width:0}
+.par .lbl{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.par .v{font-family:var(--f-mono);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.par.hit{background:var(--olive-soft)}
+.par.hit .v{color:var(--olive)}
+.dr-how{font-size:13.5px;margin:0}
+.logrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.logrow input{width:110px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 9px;font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+.hist{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px;align-items:center}
+.hist ol{list-style:none;margin:0;padding:0;font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.hist ol li{display:flex;justify-content:space-between;gap:8px}
+.hist ol li b{color:var(--ink);font-weight:600}
+.hist ol li button{appearance:none;border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px}
+.spark{width:150px;height:44px}
+.spark .ln{fill:none;stroke:var(--olive);stroke-width:1.8}
+.spark .ar{fill:var(--olive-soft)}
+.spark .pt{fill:var(--signal)}
+.spark .gd{stroke:var(--line);stroke-width:1;stroke-dasharray:2 3}
+
+/* Budget */
+.ledger{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) 130px 120px;gap:10px;padding:10px 14px;border-top:1px solid var(--line);align-items:center}
+.lrow:first-child{border-top:0}
+.lrow.head{background:var(--surface-2);font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lrow .nm{font-weight:600;min-width:0}
+.lrow .nm small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.lrow .num{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.lrow input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 8px;font-family:var(--f-mono);font-size:13px;text-align:right;color:var(--ink)}
+.lrow.total{background:var(--surface-2);font-weight:700}
+.lines{grid-column:1/-1;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px;padding-top:4px}
+.lines div{display:flex;justify-content:space-between;gap:10px}
+.lines div span:last-child{font-family:var(--f-mono);white-space:nowrap}
+@media (max-width:560px){.lrow{grid-template-columns:minmax(0,1fr) 96px 92px;padding:10px 10px}}
+.bars{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:110px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:12.5px}
+.bar-row .lab{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-row .trk{position:relative;height:14px;background:var(--surface-2);border-radius:4px}
+.bar-row .rng{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--olive) 35%,transparent);border-radius:4px}
+.bar-row .spent{position:absolute;top:3px;bottom:3px;left:0;background:var(--signal);border-radius:3px}
+.bar-row .num{font-family:var(--f-mono);text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Rules + places (ported) */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card-h{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.card-h h3{margin:0;font-family:var(--f-display);font-weight:700;font-size:21px;text-transform:uppercase}
+.zone{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:11px 14px;border-top:1px solid var(--line);align-items:start}
+.zone-name{font-weight:600;font-size:14.5px}
+.zone-note{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.acc-h{appearance:none;border:0;background:transparent;width:100%;text-align:left;padding:13px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;cursor:pointer}
+.acc-h>span:first-child{font-weight:700;font-size:15px}
+.acc-b{padding:0 16px 14px;font-size:14px;display:flex;flex-direction:column;gap:8px}
+.acc-b p{margin:0;max-width:68ch}
+.acc-b ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.place{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pl-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.pl-name{font-weight:700;font-size:15.5px;line-height:1.3}
+.pl-where{font-size:12.5px;color:var(--muted)}
+.drive{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);white-space:nowrap;text-align:right}
+.drive b{display:block;color:var(--ink);font-size:14px}
+.pl-note{font-size:13.5px;margin:0}
+.pl-more{appearance:none;border:0;background:none;padding:0;color:var(--olive);font-weight:600;font-size:13px;cursor:pointer;align-self:flex-start}
+.empty{color:var(--muted);text-align:center;padding:28px 0;font-size:14px;margin:0}
+.sources{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.sources ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.sources a{color:var(--muted)}
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:70ch;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;opacity:0;transition:opacity .2s ease;pointer-events:none}
+.toast.on{opacity:1}
+@media (max-width:520px){#hcount{display:none}.wordmark{font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">
+        <svg class="rungs" viewBox="0 0 22 26" fill="none" aria-hidden="true"><path d="M4 1v24M18 1v24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 6h14M4 13h14M4 20h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <div class="wordmark">Carry Ladder</div>
+      </div>
+      <div class="hstat"><span id="hcount"><b>0</b>/0</span><span class="sync" id="sync"><i></i><span>This device</span></span></div>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview" data-v="overview">Overview</a>
+      <a href="#path" data-v="path">The Path</a>
+      <a href="#classes" data-v="classes">Classes</a>
+      <a href="#calendar" data-v="calendar">Calendar</a>
+      <a href="#standards" data-v="standards">Standards</a>
+      <a href="#budget" data-v="budget">Budget</a>
+      <a href="#rules" data-v="rules">Carry Rules</a>
+      <a href="#places" data-v="places">Places</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="view" id="v-overview"></section>
+    <section class="view" id="v-path" hidden></section>
+    <section class="view" id="v-classes" hidden></section>
+    <section class="view" id="v-calendar" hidden></section>
+    <section class="view" id="v-standards" hidden></section>
+    <section class="view" id="v-budget" hidden></section>
+    <section class="view" id="v-rules" hidden></section>
+    <section class="view" id="v-places" hidden></section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const OLD={
+phases:[
+{id:'p1',title:'Get your bearings',when:'Weeks 1 to 2',summary:'Learn on rental guns before you own one, and start the license clock on day one.',steps:[
+{id:'s1',short:'Apply for the CCW',title:'Apply for the CCW on CCW Pro',one:'Day one. The Sheriff\'s queue is the long pole.',
+body:`<p>Rancho Santa Fe is unincorporated, so the San Diego Sheriff's License Division is your only licensing authority. Apply online, pay the first fees, and book the earliest appointment shown. Then check the portal several times a day for cancellations. Applicants in 2025 who did this pulled their appointment in from months to days.</p>
+<ul><li>References: three. If you're married, your spouse must be one of them, and a spouse satisfies both reference rules. Family-only references have been approved.</li><li>Disclose everything. Since Jan 2026 (AB 1078), inaccurate or incomplete answers require denial or revocation.</li><li>Cannabis use is a disqualifier: CA borrows the federal "unlawful drug user" definition.</li><li>You can list guns later, but you need at least one recorded to you by the course, so buy next week.</li></ul>`,
+facts:[['Portal','CCW Pro (replaced Permitium in 2024)'],['Pay now','$128.20 ($35.20 Sheriff + $93 Livescan)'],['Bring','CA license, 2 monthly proofs of residence (utility, phone, bank; no P.O. box), job history'],['Contact','ccw@sdsheriff.org · 858-974-2020']],
+links:[['CCW Pro portal','https://ccw-sdsd.cssa.cloud'],['Sheriff CCW page','https://www.sdsheriff.gov/i-want-to/get-a-permit-or-license/regulatory-licenses-and-fees/concealed-weapons-license']]},
+{id:'s2',short:'Beginner class',title:'Take a beginner class on rental guns',one:'PWG Handgun First Steps: $99, 3 hours, gun and ammo included.',
+body:`<p>Your first hours set habits you will spend years keeping or undoing. Take a structured class rather than a buddy trip to the range. PWG's First Steps is the community default for true beginners. If you want faster progress, book a private instructor for the same block of time.</p>`,
+facts:[['Where','PWG Range, 13550 Danielson St, Poway'],['Cost','$99, gun, ammo, targets provided'],['Then','Defensive Handgun, $199 (Phase 3)']],
+links:[['Handgun First Steps','https://www.pwgrange.com/class/handgun-first-steps/']]},
+{id:'s3',short:'Pass the FSC',title:'Pass the Firearm Safety Certificate',one:'$25, 30 questions, 23 to pass, at any dealer.',
+body:`<p>Required to buy any gun. Read the DOJ study guide once; most people pass on the first try. You get two attempts for the fee, and a retake is allowed after 24 hours. It's valid for 5 years. Once you hold a CCW you're exempt from it going forward.</p>`,
+facts:[['Cost','$25'],['Test','30 questions, 75% (23) to pass'],['Valid','5 years']],
+links:[['DOJ FSC FAQ','https://oag.ca.gov/firearms/fscfaqs']]},
+{id:'s4',short:'Rent 4 to 6 guns',title:'Rent and shoot 4 to 6 carry guns',one:'Pick by what you shoot best on a timer, then what conceals on you.',
+body:`<p>Dealers can only sell new guns on the California roster, and since July 1, 2026 they cannot sell new Glock-pattern pistols (AB 1127). Shoot each candidate at 7 yards on a timer and pick the one where your hits stay tight at speed. Concealment comes second; any of these hide on most bodies in an appendix holster.</p>
+<ul><li>Sig P365 X-Macro or XL (CA SKUs): the carry default, optic-ready.</li><li>S&W M&P9 2.0 Compact Carry Comp or Shield Plus OR.</li><li>Springfield Hellcat Pro or Echelon 4.0C CA.</li><li>HK VP9L, CZ P-10C OR, Walther PDP (verify on the roster).</li><li>Glock 43X CA: added to the roster Sept 29, 2026, shipping around December.</li><li>Skip the Sig P320. ShivWorks, Gabe White, and Modern Samurai Project all ban it in class.</li></ul>`,
+facts:[['Rent at','PWG (free with membership), Iron Sights (130+ guns)'],['Check SKU','DOJ roster search, exact model number']],
+links:[['CA handgun roster','https://oag.ca.gov/firearms/certified-handguns/search'],['Recent additions','https://oag.ca.gov/firearms/certified-handguns/recently-added']]}
+]},
+{id:'p2',title:'Buy and secure',when:'Weeks 2 to 4',summary:'The safe goes in before the gun comes home. Locked storage is mandatory in California since Jan 2026, and with kids in the house it is the highest-stakes decision on this list.',steps:[
+{id:'s5',short:'Install safes',title:'Install a bedside quick-access safe and a main safe',one:'Every gun not on your body is locked. No nightstand drawers.',
+body:`<p>PC 25145 (effective Jan 1, 2026) requires every firearm in a home to be in a DOJ-certified safe or disabled by a certified lock unless it's on you or close enough to control. Separately, PC 25100 makes it a crime to store a gun where a child is likely to get it, even if nothing happens. Bolt a biometric or keypad quick-access safe at the bedside for the carry gun overnight, and keep everything else in the main safe.</p>`,
+facts:[['Law','PC 25145; PC 25100'],['Fines','$250, then $500, then misdemeanor'],['Buy','Only models on the DOJ certified list']],
+links:[['PC 25145 text','https://california.public.law/codes/penal_code_section_25145']]},
+{id:'s6',short:'Buy the gun',title:'Buy the carry gun',one:'Roster gun, optic-ready. 10-day wait starts at the counter.',
+body:`<p>Buy optic-ready and mount an enclosed-emitter red dot (Holosun EPS Carry or 507K, Aimpoint Acro P-2). The dot is now the modern default and is easier to learn on than it looks. At the dealer you'll do the paperwork, a hands-on safe handling demo, and show a safe receipt or take the included lock. Pick up within 30 days of the transfer or it cancels.</p>
+<ul><li>California caps you at 3 firearm purchases per 30 days (since Apr 1, 2026). A CCW does not exempt you.</li><li>Dealers now record video and audio of every sale (PC 26806).</li></ul>`,
+facts:[['DROS','$37.19'],['Taxes','11% state excise + sales tax'],['Wait','10 days'],['All-in','about $1,200 to 1,500 with a dot (estimate)']],
+links:[['DOJ buyer FAQ','https://oag.ca.gov/firearms/pubfaqs']]},
+{id:'s7',short:'Holster and mags',title:'Holster, belt, and five magazines',one:'Rigid appendix Kydex with a claw, a stiff gun belt, 10-round mags.',
+body:`<p>The holster is a safety device. Get rigid Kydex that fully covers the trigger guard, with a claw or wing for concealment: PHLster, Tenicor, JM Custom Kydex, Dark Star Gear, or T.Rex Arms. Add a 1.5-inch gun belt. Classes expect five magazines; California caps them at 10 rounds even with a CCW.</p>`,
+facts:[['Budget','$300 to 500'],['Mags','5, 10-round max']]},
+{id:'s8',short:'Ammo and lockbox',title:'Buy ammo and a car lockbox',one:'1,000 practice rounds, 100 hollow points, one DOJ-listed lockbox.',
+body:`<p>Ammo is sold face to face with a background check. Your first purchase is the $19 basic check; once your gun's record posts at your current address, every purchase after is a $5 standard check. Carry ammo should be an FBI-protocol hollow point (Speer Gold Dot, Federal HST, Winchester Ranger T). The lockbox lets you legally leave the gun in the car outside the many places you can't carry.</p>`,
+facts:[['Check fee','$19 first, then $5'],['Practice','9mm FMJ, about 35 to 40 cents/round with taxes (estimate)']],
+links:[['DOJ ammo fee','https://oag.ca.gov/firearms/regs/ammofee']]}
+]},
+{id:'p3',title:'Fundamentals',when:'Months 1 to 3',summary:'Safe gun handling and a clean draw come before anyone puts you under stress. Dry fire does most of the work; live fire confirms it.',steps:[
+{id:'s9',short:'Join PWG',title:'Join a range and get holster qualified',one:'PWG Gold, then Defensive Handgun to unlock draw practice.',
+body:`<p>PWG is the best facility in the county, and every membership includes free rentals. Members who pass PWG's holster qualification can draw on the 25 and 50 yard bays. Its $199 Defensive Handgun class covers the draw, malfunctions, and California use of force. Appendix draws on the line are reportedly not allowed, so practice appendix in dry fire.</p>`,
+facts:[['Gold','$200 to join + $49/mo, 50 yd lanes'],['Silver','$75 + $29/mo, 25 yd only'],['Class','Defensive Handgun $199']],
+links:[['PWG membership','https://www.pwgrange.com/membership'],['Defensive Handgun','https://www.pwgrange.com/class/defensive-handgun/']]},
+{id:'s10',short:'Private lessons',title:'Book 3 to 4 private lessons',one:'Fastest way to build clean fundamentals. Insist on a shot timer.',
+body:`<p>Group classes can't fix your grip and trigger as fast as one coach can. Names that came up repeatedly in 2024 to 2026 San Diego threads: West Coast Kinetic Solutions (Oceanside, Level 1 covers strong-side and appendix draw), H2K Defense (own outdoor range, movement and reloads), and John Woo at PWG. Vet anyone with the red flags in the Places tab.</p>`,
+facts:[['Budget','$100 to 150/hr (estimate)']]},
+{id:'s11',short:'Dry fire daily',title:'Dry fire 10 to 15 minutes, 5 days a week',one:'Draws, reloads, trigger work. Dry reps outnumber live 3 to 5 to 1.',
+body:`<p>Every serious shooter does this. Use a dedicated room with no ammunition in it and a solid backstop, and finish with a deliberate "last rep" ritual so you never dry fire a loaded gun. A MantisX sensor diagnoses grip and trigger faults early. Ben Stoeger's <em>Dry Fire Reloaded</em> is the standard workbook.</p>`,
+facts:[['Tools','MantisX, DryFireMag (fits P365, M&P, PDP)'],['Later','CoolFire CO2 trainer, $460+']]},
+{id:'s12',short:'Weekly live fire',title:'Shoot weekly with a shot timer',one:'150 to 300 rounds. Test against the Drills tab, not feel.',
+body:`<p>Run Dot Torture at 3 yards until it's clean, then the Sheriff's qualification, then FAST. A timer turns vague progress into numbers you can push.</p>`},
+{id:'s13',short:'Stop the Bleed',title:'Take Stop the Bleed and carry a tourniquet',one:'Free or cheap, about 2 hours. A gunfight creates casualties.',
+body:`<p>If you carry a gun you should carry the means to stop bleeding, yours or a family member's. Take a class and carry a CAT Gen 7 or SOF-T Wide tourniquet plus a compact trauma kit.</p>`,
+links:[['Find a class','https://www.stopthebleed.org/']]},
+{id:'s14',short:'Use-of-force law',title:'Learn California use-of-force law',one:'Law of Self Defense Level 1, about $90, with a free CA supplement.',
+body:`<p>The legal aftermath is where most carriers are least prepared. Andrew Branca's online course is about 10 hours and includes a California supplement. Later, the Massad Ayoob Group's MAG-20 Classroom ($525) or MAG-40 ($1,000) are the gold standard, but they currently have no West Coast dates.</p>`,
+links:[['Law of Self Defense','https://lawofselfdefense.com/core']]},
+{id:'s15',short:'First match',title:'Shoot your first match',one:'Escondido Fish & Game Combat Match, 1st Saturday, $20.',
+body:`<p>A match is the cheapest pressure you can buy: a timer, an audience, and a holster. EFGA's Combat Match is beginner-to-intermediate steel shot from the holster. Show up for the 7:00 start; the 8:00 safety brief is mandatory. Register on Practiscore.</p>`,
+facts:[['Bring','Holster covering the trigger, 3 mags, about 120 rounds'],['No','Steel-core ammo']],
+links:[['Combat Match','https://www.escondidofishandgame.com/events/combat-match/']]}
+]},
+{id:'p4',title:'Get licensed',when:'Months 1 to 6, in parallel',summary:'The Sheriff runs on its own clock: about 75 to 90 days from your appointment to conditional approval, then the course, then the card by mail. One 2025 applicant went from application to card in 118 days.',steps:[
+{id:'s16',short:'Ridgehaven visit',title:'Attend the Ridgehaven appointment',one:'One visit: document review, Livescan, photo. About 90 minutes.',
+body:`<p>The Sheriff cut in-person visits from three to one. The payment link may arrive by email the morning of. Bring originals of everything you uploaded.</p>`,
+facts:[['Where','9621 Ridgehaven Ct, San Diego 92123'],['Interview','Fact check of your application, no "good cause" grilling']]},
+{id:'s17',short:'Background wait',title:'Wait out the background check',one:'About 75 to 90 days. References get called near the end.',
+body:`<p>Status usually changes around day 78 to 80, followed by calls to your references. By law the Sheriff must notify you within 120 days of a complete application or 30 days after DOJ results, whichever is later. If you stall, email ccw@sdsheriff.org; posters describe staff as responsive. Denials can be appealed within 21 days.</p>`,
+facts:[['2025 data','76 and 74 days, appointment to approval'],['Law','PC 26205']]},
+{id:'s18',short:'Book the 16-hour',title:'Book the 16-hour course for just after approval',one:'Book during the wait; take it after the "Approved: More Actions Required" email.',
+body:`<p>Only certificates from the Sheriff's approved vendor list count, and you must qualify with every gun you want on the license. The Sheriff's pages say both 90 days and 6 months to finish after approval, so plan on 90. The qualification is easy if you've done Phase 3: 15 rounds at 7, 5, and 3 yards, including one-handed strings, and 13 of 15 must hit.</p>
+<ul><li>Practical Is Tactical (Pala Range), $340: unlimited guns, includes Arizona and Utah permit certificates, run by a CA POST firearms instructor.</li><li>Discount Gun Mart (Kyle Dau), $400: the most-endorsed instructor across San Diego threads.</li><li>PWG Concealed American, $499: two days, up to 3 guns, closest.</li></ul>`,
+facts:[['Rounds','100 total; 30 per extra gun'],['Pass','13/15 at 3 to 7 yards']],
+links:[['Approved vendor list','https://www.sdsheriff.gov/home/showpublisheddocument/10203/639161840866700000']]},
+{id:'s19',short:'Close out',title:'Close out and receive the card',one:'Upload the certificate and issuance letter, pay $140.80. Card by mail.',
+body:`<p>Upload both sides of the signed Issuance Letter and your qualification certificate, pay the final fee, then email the Sheriff to confirm. Cards arrive in 1 to 4 weeks. You can modify the license twice per 2-year term ($10 each) to add or drop guns.</p>`,
+facts:[['Sheriff + DOJ','$269 total'],['With course','about $610 to 770']]},
+{id:'s20',short:'Start carrying',title:'Start carrying, with the rules down cold',one:'No drinking at all, 2 guns max, lockbox in the car.',
+body:`<p>Read the Rules tab before your first day. Most of the friction in North County daily life comes from three rules: no carry in restaurants that serve alcohol, no carry in parks and on beaches, and no alcohol at all while carrying. Plan to lock the gun in the car often.</p>`}
+]},
+{id:'p5',title:'Train hard',when:'Months 3 to 12',summary:'The rigorous part. Immersion first, then modern instructors who test you against published standards, then unscripted force-on-force once your draw is safe.',steps:[
+{id:'s21',short:'Gunsite 250',title:'Gunsite Day Zero + 250 Defensive Pistol',one:'5 days in Paulden, AZ. The best on-ramp that accepts true beginners.',
+body:`<p>Almost every elite modern instructor turns away brand-new shooters; Gunsite doesn't. The 250 is a safe, immersive bootcamp with simulators and a night shoot, and it rents pistols if you'd rather not travel with yours. The critique is real: some doctrine is dated and its standards are softer than Gabe White's or Rangemaster's. Take it for immersion, then move to the instructors below. Book early; sessions sell out.</p>`,
+facts:[['Tuition','$2,135 + $250 Day Zero'],['Ammo','about 1,050 rounds'],['Rental','$35/day, $45 with a dot'],['Next','Nov 30–Dec 4, Jan 11–15, Feb 1–5 (Bring-a-Buddy)'],['Unlocks','350, Vehicle Defense, Concealed Carry Pistol']],
+links:[['Gunsite 250','https://www.gunsite.com/event/250-defensive-pistol-21/'],['Day Zero','https://www.gunsite.com/classes/day-zero/']]},
+{id:'s22',short:'Start BJJ',title:'Start grappling twice a week',one:'Most fights at contact distance are wrestling matches first.',
+body:`<p>Brazilian jiu-jitsu or no-gi grappling is the most-cited complement to defensive shooting. It makes ECQC far more productive and covers the fitness base several classes assume.</p>`},
+{id:'s23',short:'Modern Samurai',title:'Modern Samurai Project: AIWB Path to Performance',one:'Livermore, Feb 27–28, 2027, $600. Ends with a timed standards test.',
+body:`<p>Scott Jedlinski's classes are the modern benchmark for red dot and appendix carry, with "Black Belt" standards tested on day two. Requires familiarity with a pistol, so take it after Gunsite.</p>`,
+facts:[['Ammo','700 rounds, 5 mags'],['Holster','Kydex with claw'],['Banned','Sig P320']],
+links:[['MSP schedule','https://shop.modernsamuraiproject.com/collections/all']]},
+{id:'s24',short:'Local scenarios',title:'Local scenario training in Escondido',one:'Tactical Hyve Essential Defense, Jan 30–31, 2027, $750.',
+body:`<p>Shoot/no-shoot decisions, medical, police interaction, and optional force-on-force on a private range in Escondido. Lead instructor is a retired Navy SEAL; the company's own reviews note the founder has no military, law enforcement, or competition background. Its Force on Force class runs Mar 27–28, 2027.</p>`,
+links:[['Tactical Hyve schedule','https://tacticalhyve.corsizio.com/']]},
+{id:'s25',short:'Rangemaster TacCon',title:'Rangemaster Tactical Conference',one:'Dallas, Apr 2–4, 2027. The best instructors in one weekend.',
+body:`<p>Tom Givens' conference is the best sampler of top defensive instructors anywhere, including names who rarely teach in the West. Use it to pick who to train with next.</p>`,
+links:[['Rangemaster classes','https://rangemaster.corsizio.com/']]},
+{id:'s26',short:'ShivWorks ECQC',title:'ShivWorks ECQC (force-on-force)',one:'Month 9 to 12. Full-contact, unscripted, humbling.',
+body:`<p>Craig Douglas' Extreme Close Quarters Concepts is widely called the most important class for armed citizens: grappling for the gun, fighting from the draw, and marking-cartridge scenarios against resisting partners. It is not a beginner class. The 2026 SoCal run (Nov 20–22, Azusa) is too soon; take the next one.</p>`,
+facts:[['Cost','$775 + $60 range fee'],['Bring','Mouthpiece, cup, 220 rounds'],['Banned','Sig P320']],
+links:[['ShivWorks schedule','https://shivworks.corsizio.com/']]},
+{id:'s27',short:'Gabe White pins',title:'Gabe White: Pistol Shooting Solutions',one:'The community\'s best-known standard. Watch for an Arizona date.',
+body:`<p>Two days built around four timed drills at 7 yards, graded Dark, Light, and Turbo pins (see Drills). Not for beginners: you must hit a 6-inch square at 10 yards on demand and draw safely from concealment. Tucson ran in Oct 2026.</p>`,
+facts:[['Cost','$595 + $60'],['Class size','14 max'],['Banned','All P320 variants']]}
+]},
+{id:'p6',title:'Stay sharp',when:'Year 2 onward',summary:'Shooting skill fades within weeks of stopping. Keep a cadence and keep the paperwork current.',steps:[
+{id:'s28',short:'Monthly match',title:'A match a month, benchmarks every quarter',one:'USPSA at Pala on the 2nd and 4th Sundays, $50.',
+body:`<p>Linea de Fuego runs sanctioned USPSA at Pala and welcomes new shooters. EFGA's Fun Action Match on the 4th Saturday is a gentler USPSA-style option. Re-run the Drills tab every quarter and log the numbers.</p>`,
+links:[['Linea de Fuego','https://lineadefuego.net']]},
+{id:'s29',short:'Utah permit',title:'Get a Utah nonresident permit for travel',one:'$90. California honors no other permits, and few states honor California\'s.',
+body:`<p>A California license is almost useless outside California. A Utah nonresident permit (often paired with Arizona or Florida) covers far more states, and California residents can apply directly. The Practical Is Tactical CCW course already includes the Utah and Arizona certificates.</p>`,
+links:[['Utah BCI','https://bci.utah.gov/concealed-firearm/how-do-i-apply-for-a-concealed-firearm-permit/']]},
+{id:'s30',short:'Renew on time',title:'Renew inside the 90-day window',one:'8-hour course, new Livescan, $77 Sheriff and DOJ fee.',
+body:`<p>The license lasts 2 years. File in the 90 days before it expires with an 8-hour course certificate in hand. Since Jan 2026, if you miss the window you start over as a new applicant. Renewed cards date from the old expiration, so filing early costs nothing. Since Sept 2026 each renewal needs a fresh $93 Livescan. Mid-2026 renewals took weeks.</p>`,
+facts:[['Course','$249 to 299'],['Fees','$77 + $93 Livescan']]}
+]}
+],
+placesIntro:'Drive times are estimates from Rancho Santa Fe. Verdicts come from 2024 to 2026 reports on r/SanDiegoGuns, calguns, and caguns, plus published after-action reviews.',
+placeTypes:[['all','All'],['range','Ranges'],['ccw','CCW course'],['train','Local training'],['school','Destination'],['match','Matches'],['store','Stores']],
+places:[
+{name:'PWG Range',type:'range',where:'Poway · indoor, 42 lanes to 100 yd',drive:'25 min',driveSub:'est.',mins:25,verdict:['p-ok','Start here'],tags:['Free rentals for members','Draw for members'],cost:'$25–35/hr · Gold $49/mo',
+note:'The best facility in the county and the only indoor 100-yard range. Users praise the facility and grumble about boutique pricing on ammo and transfers.',
+more:'Holster-qualified members can draw on the 25 and 50 yd bays; appendix draws are reportedly not allowed. Class reviews are split: one 2026 poster ranked PWG last of about a dozen San Diego instructors, while others single out John Woo. Open 10a to 8p daily.',url:'https://www.pwgrange.com'},
+{name:'Iron Sights',type:'range',where:'Oceanside · indoor, 24 lanes',drive:'25 min',driveSub:'est.',mins:26,verdict:['p-ok','Best rentals'],tags:['130+ rentals','15 yd pistol bay'],cost:'$20/hr',
+note:'The best try-before-you-buy selection after PWG. Rentals require range ammo and a second shooter or your own gun.',
+more:'Holster rules are not published; one Aug 2026 report says draws were allowed. Gun sales by appointment only. The real site is iron-sights.com with a hyphen.',url:'https://www.iron-sights.com'},
+{name:'North County Shooting Center',type:'range',where:'San Marcos · indoor, 20 lanes',drive:'20 min',driveSub:'est.',mins:20,verdict:['p-warn','Rentals only'],tags:['Closest','$10 rentals'],cost:'$25/hr',
+note:'Closest range, but rapid fire and double taps are banned and draws need RSO approval from inside the booth. Fine for trying guns and slow fire; poor for defensive practice.',url:'https://www.northcountyshootingcenter.com'},
+{name:'The Gun Range',type:'range',where:'Kearny Mesa · indoor, 13 lanes',drive:'25 min',driveSub:'est.',mins:27,tags:['Free rentals Mondays','Draw with RSO OK'],cost:'$20/hr',
+note:'Draws allowed once an RSO clears you, but concealed draws are prohibited. Thin and mixed 2026 reviews.',url:'https://thegunrangesandiego.com'},
+{name:'Pala Shooting Range',type:'range',where:'Pala · outdoor, rifle to 887 yd',drive:'40 min',driveSub:'est.',mins:42,tags:['Public Mon, Fri, Sat','Cash only'],cost:'$40/day',
+note:'Open to the public 8a to 2p three days a week. No rentals or ammo sales; bring eye and ear protection. Home of USPSA matches and the Practical Is Tactical CCW course.',url:'https://range.palatribe.com'},
+{name:'Practical Is Tactical',type:'ccw',where:'Pala Range · Jason Martin',drive:'40 min',driveSub:'est.',mins:42,verdict:['p-ok','Best value'],tags:['Unlimited guns','AZ + UT certs'],cost:'$340',
+note:'Range fees included, qualify every gun you own, and you leave with Arizona and Utah permit certificates. Instructor is a CA POST firearms instructor and MAG-40 graduate, rated 5.0.',
+more:'Saturday classes: Nov 7, Nov 21, Dec 12, 2026; Jan 9 and 23, 2027. Book through its USCCA listing.'},
+{name:'Discount Gun Mart · Kyle Dau',type:'ccw',where:'Morena Blvd, San Diego · range + store',drive:'25 min',driveSub:'est.',mins:27,verdict:['p-ok','Most endorsed'],tags:['Every gun qualified','Draw access after'],cost:'$400',
+note:'The most-recommended CCW instructor across San Diego threads: real examples, no fluff. Passing the course also qualifies you for holster draws on DGM\'s range.',url:'https://range.discountgunmart.com/info/concealed-carry-courses'},
+{name:'PWG Concealed American',type:'ccw',where:'Poway',drive:'25 min',driveSub:'est.',mins:25,tags:['2 days','Up to 3 guns'],cost:'$499',
+note:'Closest high-quality option and convenient if you\'re already a member (Platinum members get 25% off classes). Bring 150 practice rounds plus 15 per gun.',url:'https://www.pwgrange.com/class/concealed-american-9/'},
+{name:'McLaren Defense',type:'ccw',where:'Oceanside · Bill McLaren',drive:'25 min',driveSub:'est.',mins:26,tags:['Beginner-friendly'],cost:'about $360',
+note:'Dozens of reviews from 2016 to 2024, nearly all positive: patient and calm with new shooters. Uses Iron Sights for classes.'},
+{name:'CCW USA',type:'ccw',where:'Escondido · Bill Desy',drive:'30 min',driveSub:'est.',mins:30,tags:['Outdoor range'],
+note:'Described on r/SanDiegoGuns as a legit course run by a good instructor. Also publishes the clearest local guidance on renewals.',url:'https://www.ccwusa.com'},
+{name:'West Coast Kinetic Solutions',type:'train',where:'Oceanside',drive:'25 min',driveSub:'est.',mins:26,verdict:['p-ok','Reddit pick'],tags:['Draw skills','Also CCW'],
+note:'Its Level 1 class (strong-side and appendix draw) is what 2026 posters recommend for real skill beyond the CCW checkbox. Also on the Sheriff\'s CCW list.'},
+{name:'Tactical Hyve',type:'train',where:'Private ranges in Escondido and Alpine',drive:'35 min',driveSub:'est.',mins:35,tags:['Scenarios','Force-on-force'],cost:'$350–1,050',
+note:'Essential Defense (Jan 30–31, 2027, $750) and Force on Force (Mar 27–28, 2027, $750). Lead instructor is a retired Navy SEAL.',
+more:'Its own reviews note the founder has no military, law enforcement, or competition background. Cheat Codes 1 (Nov 22, 2026, $350) is not for brand-new shooters.',url:'https://tacticalhyve.corsizio.com/'},
+{name:'H2K Defense',type:'train',where:'Private outdoor range, San Diego',drive:'Varies',mins:40,tags:['Movement','Reloads'],
+note:'Runs its own range where you can move, draw, and reload, which indoor bays rarely allow. Mostly special-operations veteran instructors per its site. Recommended on Reddit in 2026.'},
+{name:'Active Shooter Defense School',type:'train',where:'San Diego · Matt Klier',drive:'Varies',mins:40,tags:['Advanced'],
+note:'Cadre includes former SEALs and Rangers, praised as no-nonsense. One student said it is not for inexperienced shooters, so save it for after Phase 3.',url:'https://www.asdschool.com/'},
+{name:'Law of Self Defense',type:'train',where:'Online · Andrew Branca',drive:'Online',mins:0,tags:['CA supplement'],cost:'about $90',
+note:'Level 1 Core, about 10 hours of video, with a free California supplement. The most efficient legal grounding available.',url:'https://lawofselfdefense.com/core'},
+{name:'Gunsite Academy',type:'school',where:'Paulden, Arizona',drive:'6 hr',driveSub:'drive',mins:360,verdict:['p-ok','Best on-ramp'],tags:['No prerequisite','Rents pistols'],cost:'$2,135 + $250',
+note:'The 250 Defensive Pistol plus Day Zero is the rare elite course that accepts zero-experience students. Immersive and very safe, with simulators and a night shoot.',
+more:'Critics call its doctrine dated and its standards softer than modern instructors. Next 250s: Nov 30–Dec 4, Jan 11–15, Feb 1–5 (Bring-a-Buddy), then Mar 8–12, 2027. Earning Marksman unlocks the 350, Vehicle Defense, and Concealed Carry Pistol courses.',url:'https://www.gunsite.com/event/250-defensive-pistol-21/'},
+{name:'ShivWorks ECQC',type:'school',where:'SoCal run: Los Alamitos + Azusa',drive:'2 hr',driveSub:'est.',mins:120,verdict:['p-warn','Month 9+'],tags:['Force-on-force','Full contact'],cost:'$775 + $60',
+note:'The class most often called essential for armed citizens. Requires a safe draw and basic fitness. Nov 20–22, 2026 is too soon; target the next SoCal date.',url:'https://shivworks.corsizio.com/'},
+{name:'Modern Samurai Project',type:'school',where:'Los Angeles · Livermore',drive:'2.5 hr',driveSub:'LA est.',mins:150,tags:['Red dot','AIWB','Standards test'],cost:'$600–650',
+note:'Red Dot Pistol in LA (Nov 7–8, 2026) and AIWB Path to Performance in Livermore (Feb 27–28, 2027). Requires familiarity with a pistol.',url:'https://shop.modernsamuraiproject.com/collections/all'},
+{name:'Gabe White',type:'school',where:'Pistol Shooting Solutions · Arizona dates vary',drive:'Varies',mins:400,tags:['Pin standards','14 max'],cost:'$595 + $60',
+note:'The best-known measurable standard in the community. Not for beginners. Tucson ran Oct 2026; watch for the next western date.'},
+{name:'Rangemaster TacCon',type:'school',where:'Dallas, Texas',drive:'Fly',mins:900,tags:['Sampler','Top instructors'],
+note:'Apr 2–4, 2027. The best single weekend to sample instructors like John Hearne and Chuck Haggard who rarely teach out West.',url:'https://rangemaster.corsizio.com/'},
+{name:'Thunder Ranch',type:'school',where:'Lakeview, Oregon',drive:'Fly',mins:800,tags:['Shoot house','Dates TBA'],
+note:'Defensive Handgun 1 is open to first-timers and includes low light and a live-fire shoot house. 2027 dates and prices aren\'t posted. Book through traintr.com; a similarly named domain belongs to an unaffiliated company.',url:'https://www.traintr.com/'},
+{name:'EFGA Combat Match',type:'match',where:'Escondido Fish & Game · 1st Saturday',drive:'35 min',driveSub:'est.',mins:38,verdict:['p-ok','First match'],tags:['Holster steel','Beginner OK'],cost:'$20',
+note:'Beginner-to-intermediate steel from the holster. 7:00a start, mandatory 8:00a safety brief, register on Practiscore. Club membership itself has a waitlist dating to 2009.',url:'https://www.escondidofishandgame.com/events/combat-match/'},
+{name:'EFGA Fun Action Match',type:'match',where:'Escondido Fish & Game · 4th Saturday',drive:'35 min',driveSub:'est.',mins:38,tags:['USPSA-style','30 shooters max'],
+note:'Four stages, 100 to 125 rounds, scored like USPSA without the sanctioning. A good step between steel and real USPSA.',url:'https://www.escondidofishandgame.com/events/funactionmatch/'},
+{name:'Linea de Fuego USPSA',type:'match',where:'Pala Range · 2nd and 4th Sundays',drive:'40 min',driveSub:'est.',mins:42,tags:['Sanctioned','New shooters welcome'],cost:'$50',
+note:'Sanctioned USPSA. The fastest way to learn to shoot fast and accurately under a timer, with movement.',url:'https://lineadefuego.net'},
+{name:'PWG Store',type:'store',where:'Poway',drive:'25 min',driveSub:'est.',mins:25,tags:['Huge inventory'],
+note:'Biggest selection in the county. Posters say in-store prices run below the MSRP shown online; transfer fees are high.',url:'https://www.pwgrange.com'},
+{name:'Discount Gun Mart',type:'store',where:'Morena Blvd and Santee',drive:'25 min',driveSub:'est.',mins:27,tags:['Large store'],
+note:'Well regarded, with an attached range and the most-endorsed local CCW instructor.',url:'https://www.discountgunmart.com'},
+{name:'Desert Depot Arms',type:'store',where:'4061 Oceanside Blvd, Oceanside',drive:'25 min',driveSub:'est.',mins:27,tags:['Tue, Wed, Fri only'],
+note:'An Oct 2026 Reddit post praised its stock. Open only 10a to 4p three days a week.'}
+],
+rulesIntro:'Verified Oct 24, 2026. The carry map comes from SB 2 as trimmed by the Ninth Circuit in 2024, plus the Supreme Court\'s Wolford ruling in June 2026. Search a place to see where it lands.',
+zones:[
+{name:'Anywhere, after any alcohol',s:'no',alias:'drink beer wine dinner party',note:'A licensee may not drink at all while carrying, or carry while under the influence of alcohol, drugs, or medication (PC 26200).'},
+{name:'Restaurants and bars that serve alcohol',s:'no',alias:'brewery taproom winery hotel bar club grill dinner',note:'Any place licensed to sell alcohol for on-site drinking, including its parking lot. That covers most sit-down restaurants. Upheld by the Ninth Circuit and enforced since Jan 2025.'},
+{name:'Golf clubhouse or grill',s:'no',alias:'golf club country club',note:'If it serves alcohol on site, it falls under the alcohol rule. The course itself is private property under the club\'s own policy.'},
+{name:'Public parks and athletic fields',s:'no',alias:'park beach little league soccer field playground youth sports trail balboa',note:'Includes athletic facilities open to the public and adjacent sidewalks, so youth ball fields count. Most city and county beaches are parks. Playgrounds and youth centers are separately banned.'},
+{name:'State parks and state beaches',s:'no',alias:'torrey pines carlsbad san elijo cardiff beach anza borrego',note:'All State Parks and Fish & Wildlife land, which covers most coastal state beaches in North County.'},
+{name:'Hiking trails',s:'dep',alias:'hike trail elfin forest lake hodges cleveland national forest',note:'Trails in city or county parks and open-space preserves count as parks: no. State parks: no. National forest land outside federal buildings generally follows state law.'},
+{name:'K-12 schools, preschools, childcare',s:'no',alias:'school pickup daycare preschool',note:'Grounds and parking lots. At pickup the gun stays in a locked box, out of view, in the car.'},
+{name:'Colleges and universities',s:'no',alias:'ucsd usd csusm college campus',note:'Buildings, grounds, and parking. The public right-of-way exception does not apply to campuses.'},
+{name:'Government buildings and courts',s:'no',alias:'dmv city hall courthouse county',note:'State, local, and court buildings including their parking areas. Use the car lockbox.'},
+{name:'Post offices and federal buildings',s:'no',alias:'post office usps federal',note:'Federal law. The car lockbox exception does not cover federal property, so don\'t bring it into the lot.'},
+{name:'Casinos and racetracks',s:'no',alias:'del mar racetrack horse racing casino pala valley view',note:'Gambling venues, explicitly including tracks licensed by the California Horse Racing Board.'},
+{name:'Stadiums, arenas, pro and college games',s:'no',alias:'petco snapdragon pechanga concert',note:'Including their parking areas and any collegiate or pro sporting event.'},
+{name:'Zoos and museums',s:'no',alias:'san diego zoo safari park museum',note:'Buildings, grounds, and parking.'},
+{name:'Amusement parks',s:'no',alias:'legoland seaworld',note:'Including parking.'},
+{name:'Airports',s:'no',alias:'san airport terminal flying',note:'Passenger terminals. To fly with a gun, check it unloaded in a locked hard case and declare it.'},
+{name:'Libraries, police stations, polling places',s:'no',alias:'library police voting jail',note:'Also jails, prisons, and nuclear facilities.'},
+{name:'Stores, offices, and businesses open to the public',s:'yes',alias:'grocery retail store mall office target costco',note:'California\'s "no carry unless posted" default is enjoined, and the Supreme Court struck Hawaii\'s version in June 2026. A posted no-guns sign or a request to leave still controls: leave.'},
+{name:'Hospitals and doctors\' offices',s:'yes',alias:'hospital clinic urgent care dentist doctor medical',note:'Enjoined since 2023, so currently allowed. Could change when the trial court reaches final judgment.'},
+{name:'Churches and places of worship',s:'yes',alias:'church worship',note:'The default ban is enjoined. Your church can still ask you not to carry.'},
+{name:'Banks',s:'yes',alias:'bank credit union atm financial',note:'Enjoined, so currently allowed.'},
+{name:'Public transit',s:'yes',alias:'coaster sprinter trolley bus mts nctd',note:'Enjoined. If that flips, a 2026 law still lets you carry it unloaded in a lockbox.'},
+{name:'Permitted public events',s:'yes',alias:'street fair parade rally festival event',note:'The permitted-gathering ban is enjoined. Events on private property follow the owner\'s rules.'},
+{name:'Your home and property',s:'yes',alias:'house home yard',note:'Allowed even without a license (PC 25605). When it\'s not on you, it\'s locked.'},
+{name:'Your car',s:'yes',alias:'vehicle car truck drive',note:'Loaded on your person with a license. Left in the car, it goes in a locked box out of view or the trunk; an SUV cargo area is not a trunk.'},
+{name:'Friends\' homes, hotels, your office',s:'dep',alias:'hotel friend office work employer',note:'Owner\'s or employer\'s rules govern. Any bar or restaurant area inside a hotel is a no.'},
+{name:'Other states',s:'dep',alias:'travel arizona nevada utah hawaii',note:'Few states honor a California license. A Utah nonresident permit covers far more.'}
+],
+rules:[
+{title:'Buying a handgun',conf:'High',body:`<ul><li>Firearm Safety Certificate: $25, 23 of 30 to pass, valid 5 years. CCW holders are exempt.</li><li>Age 21 for handguns. DROS fee $37.19, plus the 11% state excise tax (since July 2024) and sales tax.</li><li>Hands-on safe handling demo, then a 10-day wait. Pick up within 30 days or the sale cancels.</li><li>Limit: 3 firearms per rolling 30 days since Apr 1, 2026 (AB 1078). The old 1-in-30 handgun limit was struck down in 2025. CCW holders are not exempt.</li><li>Off-roster guns can only come through a private-party transfer at a dealer (up to $10 extra per gun).</li><li>Dealers record video and audio of every sale and keep it a year.</li></ul>`},
+{title:'The roster and the Glock ban',conf:'Moderate',body:`<p>Since July 1, 2026, dealers cannot sell new pistols with a cruciform trigger bar that a backplate "switch" could convert to full auto (AB 1127). Every Gen 3 Glock on the roster is flagged. Owning one and buying one used through a private-party transfer stay legal.</p><ul><li>Glock 43X CA was added Sept 29, 2026 without the flag; deliveries are expected around December.</li><li>The U.S. Justice Department sued California on July 1, 2026; the request for an immediate block was denied July 9 and the case is pending.</li><li>A separate federal motion for an injunction was denied on procedural grounds Aug 24, 2026 (one source).</li><li>Microstamping is enjoined, which opened the roster to many new models in Sept 2026. Chamber indicators and magazine disconnects are still required, and the expansion could reverse if that injunction falls.</li></ul>`},
+{title:'Storage at home',conf:'High',body:`<p>Since Jan 1, 2026, every gun in a home must be in a DOJ-certified safe or locked with a certified device unless it's on you or close enough to control (PC 25145). Fines start at $250, then $500, then misdemeanors.</p><p>Separately, storing a gun where a child is likely to get it is a crime even if nothing happens (PC 25100, third degree). If a child gets it and someone is hurt, it can be a felony.</p>`},
+{title:'Driving without a license',conf:'High',body:`<ul><li>Unloaded, in the trunk or a locked container. A glove box or console does not count.</li><li>Carry it to and from the car in a locked container.</li><li>Unattended car: trunk, or a locked container out of view or bolted to the car. SUV cargo areas are not trunks. Up to $1,000 fine.</li></ul>`},
+{title:'Carrying with a license',conf:'High',body:`<ul><li>Carry only guns listed on your license, and no more than two at once.</li><li>Carry the card. Show it, and surrender the gun for inspection, when an officer asks.</li><li>No alcohol at all, and no carrying under the influence of anything, including medication.</li><li>Don't display the gun without justification. Report new arrests, charges, and restraining orders.</li><li>Magazines are still capped at 10 rounds.</li><li>Breaking any license condition means mandatory revocation.</li><li>At banned places, you can drive into the lot and lock the gun in a DOJ-listed box out of view, except on federal property.</li></ul>`},
+{title:'Ammunition',conf:'High',body:`<p>Every ammo purchase is in person with a background check: $19 for the first (valid 30 days), then $5 once your gun's record matches your address. Online orders ship to a vendor, who charges a handling fee. Bringing ammo bought out of state into California yourself is illegal. A federal appeals court is reconsidering the whole scheme en banc (argued Mar 25, 2026); until it rules, everything stays in force.</p>`},
+{title:'Your privacy as a license holder',conf:'High',body:`<p>CCW applications and licenses are public records in California (<em>CBS v. Block</em>, 1986). Your name can be disclosed; details showing when or where you're vulnerable, and medical history, can be withheld. In June 2022 the state DOJ accidentally published names, birth dates, addresses, and driver's license numbers of roughly 192,000 CCW applicants for about a day. Assume the fact that you hold a license can become known.</p>`},
+{title:'Travel',conf:'Moderate',body:`<ul><li>California honors no other state's permit, and few states honor California's.</li><li>A Utah nonresident permit costs $90 and California residents can apply directly. Arizona and Florida nonresident permits widen coverage further.</li><li>Federal law protects unloaded, locked transport through restrictive states.</li><li>Driving to Gunsite with your own gun is legal: unloaded and locked in California. Or rent there.</li></ul>`},
+{title:'Pending cases to watch',conf:'Moderate',body:`<ul><li><strong>Rhode v. Bonta</strong>: ammo checks, en banc decision pending.</li><li><strong>Duncan v. Bonta</strong>: 10-round magazine limit, Supreme Court petition pending.</li><li><strong>U.S. v. California</strong>: the Glock ban and roster, injunction pending.</li><li><strong>May v. Bonta</strong>: the sensitive-places case resumed July 2026 after Wolford; the enjoined categories above could become permanent or flip.</li><li><strong>U.S. v. Hemani</strong> (June 2026) narrowed the federal drug-user ban, which may affect California's matching CCW disqualifier.</li><li>The 11% excise tax faces a state court challenge brought by PWG.</li></ul>`}
+],
+drillsIntro:'The community\'s measurable standards, ordered roughly by when you\'ll be ready for them. Log your best clean run, with miss penalties added to the time; the tier you reach lights up. Results stay on this device.',
+drills:[
+{id:'sdq',name:'Sheriff qualification',setup:'15 rds · 7, 5, 3 yd · one-handed strings',kind:'score',tiers:[['Pass','13/15',13],['Clean','15/15',15]],
+how:'5 rounds two-handed at 7 yards, 5 at 5 yards, then 3 strong-hand and 2 weak-hand at 3 yards. 13 of 15 inside the line passes. The test that gets you the card, and a low bar.'},
+{id:'dot',ph:'e.g. 47',name:'Dot Torture',setup:'50 rds · 3 yd · 10 dots, 2-inch',kind:'score',tiers:[['Pass at 3 yd','50/50',50]],
+how:'Todd Green\'s precision test, including strong-hand, weak-hand, and reload strings. Once you clean it at 3 yards, back up a yard at a time. Use it as a test, not daily practice.'},
+{id:'fast',ph:'e.g. 9.40',name:'F.A.S.T.',setup:'6 rds · 7 yd · from concealment',kind:'time',tiers:[['Intermediate','< 10.00',9.999],['Advanced','< 7.00',6.999],['Expert','< 5.00',4.999]],
+how:'Draw, 2 rounds into a 3x5 card, slide-lock reload, 4 rounds into an 8-inch circle. Add 1 second per hit outside the circle and 2 per miss on the card. Best shot cold.'},
+{id:'bill',name:'Bill Drill',setup:'6 rds · 7 yd · body A-zone',kind:'time',tiers:[['Dark pin','3.50',3.5],['Light pin','2.50',2.5],['Turbo pin','2.00',2.0]],
+how:'Draw and fire six rounds into the A-zone. Gabe White\'s pin times; subtract 0.25 seconds if drawing from concealment. Add 0.25 per C-zone hit, 1 per D-zone, 2 per miss.'},
+{id:'fail',ph:'e.g. 3.10',name:'Failure Drill',setup:'3 rds · 7 yd · 2 body, 1 head',kind:'time',tiers:[['Dark pin','2.90',2.9],['Light pin','2.25',2.25],['Turbo pin','1.70',1.7]],
+how:'Two to the body, one to the head box. Same Gabe White penalties and concealment bonus as the Bill Drill.'},
+{id:'casino',ph:'e.g. 26.4',name:'Casino Drill',setup:'21 rds · 5 yd · 3 mags of 7',kind:'time',tiers:[['Rangemaster par','21.0',21]],
+how:'Tom Givens\' drill: shoot numbered shapes 1 through 6 in order with 1, 2, 3, 4, 5, then 6 rounds, with two reloads. Add 1 second per miss or out-of-order shot.'},
+{id:'bad',ph:'e.g. 186',name:'Rangemaster Baseline',setup:'20 rds · B-8 · 5 to 10 yd',kind:'score',tiers:[['Pass','190/200',190]],
+how:'Five strings from concealment, each with a par time: 5 at 5 yd in 5 s; strong-hand 3 in 3 s; weak-hand 2 in 3 s; 3, reload, 3 at 7 yd in 10 s; 4 at 10 yd in 4 s. Pass means every string under par and 190 or better.'},
+{id:'wilson',ph:'e.g. 38.5',name:'Wilson 5x5',setup:'25 rds · 10 yd · IDPA target',kind:'time',tiers:[['Carry floor','50',50],['Expert','25',25],['Master','20',20],['Grandmaster','15',15]],
+how:'Four 5-shot strings totaled with penalties. Over 50 seconds is rated "not proficient enough to carry."'}
+],
+sources:[
+['San Diego Sheriff: CCW license','https://www.sdsheriff.gov/i-want-to/get-a-permit-or-license/regulatory-licenses-and-fees/concealed-weapons-license'],
+['San Diego Sheriff: CCW statistics','https://www.sdsheriff.gov/i-want-to/get-a-permit-or-license/regulatory-licenses-and-fees/statistics'],
+['North County Daily Star: CCW wait times, Apr 2025','https://northcountydailystar.com/carry-concealed-weapons-ccw-permits/'],
+['Penal Code 26230: prohibited places','https://california.public.law/codes/penal_code_section_26230'],
+['Penal Code 26200: license conditions','https://california.public.law/codes/penal_code_section_26200'],
+['Penal Code 27595: AB 1127','https://california.public.law/codes/penal_code_section_27595'],
+['Ninth Circuit: Wolford v. Lopez (2024)','https://cdn.ca9.uscourts.gov/datastore/opinions/2024/09/06/23-16164.pdf'],
+['Supreme Court: Wolford v. Lopez (2026)','https://en.wikipedia.org/wiki/Wolford_v._Lopez'],
+['Ninth Circuit: Nguyen v. Bonta (2025)','https://cdn.ca9.uscourts.gov/datastore/opinions/2025/06/20/24-2036.pdf'],
+['The Reload: Glock ban TRO denied','https://thereload.com/judge-denies-doj-request-to-immediately-block-californias-glock-ban/'],
+['CA DOJ: roster additions','https://oag.ca.gov/firearms/certified-handguns/recently-added'],
+['CBS v. Block (1986)','https://scocal.stanford.edu/opinion/cbs-inc-v-block-28477'],
+['Gunsite Academy: 250 Defensive Pistol','https://www.gunsite.com/event/250-defensive-pistol-21/'],
+['pistol-training.com: drills and standards','https://pistol-training.com/drills/the-fast'],
+['Lucky Gunner: training with Gabe White','https://www.luckygunner.com/lounge/training-with-gabe-white/amp/']
+],
+disclaimer:'Verified Oct 24, 2026 against the Penal Code, CA DOJ, the San Diego Sheriff, court records, and school registration pages. Several rules turn on pending cases, so recheck the Rules tab before relying on a borderline call.'
+};
+</script>
+<script>
+/* ---------- DATA ---------- */
+const TODAY = new Date().toISOString().slice(0,10);
+const VERIFIED = 'Nov 14, 2026';
+
+const NEW_STEPS = {
+n1:{id:'n1',short:'Earn Marksman',title:'Earn a Marksman grade at the 250',one:'Marksman or better unlocks the 350, the 350 Night and the 499.',isNew:true,
+body:`<p>Gunsite grades every 250 student. Marksman or higher is the prerequisite for the 350, and the 499 requires Marksman in both the 250 and the 350, so treat the 250 as a test. Arrive with your Tier 2 standards already met (Dot Torture clean, F.A.S.T. under 10) and the week becomes refinement instead of remediation.</p>`,
+facts:[['Unlocks','350 Intermediate, 350 with Optics, 350 Night, then 499'],['Not valid','A Seasoned Citizen 250 does not count toward the regular 350']],
+links:[['350 prerequisites','https://www.gunsite.com/classes/350-intermediate-defensive-pistol-class/']]},
+n2:{id:'n2',short:'Local force-on-force',title:'Tactical Hyve: Force on Force',one:'Escondido, Mar 27–28, 2027, $750. A local warm-up for ECQC.',isNew:true,
+body:`<p>Marking-cartridge scenarios close to home. Use it to learn how you behave when the target thinks and moves before you travel for ECQC. The same caveat applies as in Tier 4: the founder has no military, law enforcement or competition background per the company's own reviews; the lead instructor is a retired Navy SEAL.</p>`,
+links:[['Tactical Hyve schedule','https://tacticalhyve.corsizio.com/']]},
+n3:{id:'n3',short:'Advanced medical',title:'Take a two-day trauma care class',one:'The step past Stop the Bleed: wound packing, airway, casualty movement.',isNew:true,
+body:`<p>Dark Angel Medical's DARC is the class most often named for armed citizens: about half lecture and half hands-on, over two days. No California 2027 dates were posted when this was checked, so expect to travel or to host one; Dark Angel has historically run hosted classes. Upgrade the kit you carry once you finish.</p>`,
+facts:[['Checked',VERIFIED+': no CA 2027 dates found'],['Confidence','Low on availability']]},
+n4:{id:'n4',short:'Legal course',title:'MAG-20 Classroom or MAG-40',one:'Massad Ayoob\'s legal-aftermath course. $525 / $1,000.',isNew:true,
+body:`<p>The gold standard for the legal side of a defensive shooting: what to say, what not to say, how cases are built, and how experts testify. MAG-40 adds two range days. There were no West Coast dates at the last check, so plan travel or pair it with another trip east.</p>`},
+n5:{id:'n5',short:'Low-light basics',title:'Carry a light and train with it',one:'A handheld light every day, plus low-light dry fire at home.',isNew:true,
+body:`<p>Identify before you shoot. Carry a handheld light, practice drawing it with the pistol in dry fire, and build up to live low-light work in Tier 6 (Gunsite's 350 Night). Indoor ranges rarely let you train in the dark, which is one more reason to travel for it.</p>`},
+n6:{id:'n6',short:'Gunsite 350',title:'Gunsite 350 Intermediate Pistol',one:'5 days, $2,345, about 1,200 ball + 100 frangible.',isNew:true,
+body:`<p>Faster, more complex problems than the 250, with more simulator work. Requires your 250 Marksman. A version built around pistol-mounted optics runs Jun 7–11, 2027.</p>`,
+facts:[['2027','Jan 18–22, Mar 8–12, Apr 12–16, Aug 30–Sep 3, Sep 27–Oct 1'],['Prereq','250 at Marksman or higher']],
+links:[['Gunsite 350','https://www.gunsite.com/classes/350-intermediate-defensive-pistol-class/']]},
+n7:{id:'n7',short:'350 Night',title:'Gunsite 350 Night (low light)',one:'Oct 25–29, 2027. The same curriculum, mostly in the dark.',isNew:true,
+body:`<p>The best structured low-light course on the path. Tuition was not listed in the results checked; confirm on Gunsite's page before budgeting.</p>`,
+links:[['350 Night','https://www.gunsite.com/classes/350-lowlight/']]},
+n8:{id:'n8',short:'Gunsite 499',title:'Gunsite 499 Advanced Pistol',one:'The summit of Gunsite\'s pistol track. $2,575, Oct 4–8, 2027.',isNew:true,
+body:`<p>Day and night live-fire simulators plus force-on-force with role players. Requires Marksman in both the 250 and the 350. The Mar 15–19, 2027 class was already sold out, so book the next one as soon as you have your 350 grade.</p>`,
+facts:[['Ammo','1,100 ball + 250 frangible'],['Prereq','250 and 350, both Marksman+'],['Next open','Oct 4–8, 2027']],
+links:[['Gunsite 499','https://www.gunsite.com/classes/499-advanced-defensive-pistol-class/']]},
+n9:{id:'n9',short:'Rangemaster',title:'Rangemaster Combative Pistol with Tom Givens',one:'Lakeland, FL, Mar 20–21, 2027, $495.',isNew:true,
+body:`<p>Givens' students have one of the best-documented records of real-world outcomes in the civilian training world. Two dense days of shooting, decision-making and mindset, graded against the Rangemaster standards in the Standards tab.</p>`,
+links:[['Rangemaster registration','https://rangemaster.corsizio.com/']]},
+n10:{id:'n10',short:'Instructor track',title:'Optional: become an instructor',one:'Rangemaster Protective Pistolcraft ID: Nashville, Jul 19–23, 2027, $1,350.',isNew:true,
+body:`<p>Teaching forces you to understand the material at a different depth. Rangemaster's five-day instructor development course lists no prerequisites. Its Advanced and Master instructor courses require the earlier ones, and the Master course requires both Instructor and Advanced Instructor Development.</p>`,
+links:[['Rangemaster registration','https://rangemaster.corsizio.com/']]}
+};
+
+const TIERS = [
+{n:0,id:'t0',title:'Orientation',when:'Weeks 1–2',img:'lane',steps:['s1','s2','s3','s4'],
+ gate:'Nothing. Start today.',exit:'FSC passed, CCW application filed, carry gun chosen on a timer.',
+ sum:'Learn on rental guns before you own one, and start the license clock on day one.'},
+{n:1,id:'t1',title:'Equip & Secure',when:'Weeks 2–4',img:'gear',steps:['s5','s6','s7','s8'],
+ gate:'Firearm Safety Certificate in hand.',exit:'Gun recorded to you, locked storage installed, holster, belt, 5 mags, 1,000 rounds.',
+ sum:'The safe goes in before the gun comes home. Locked storage is mandatory in California since Jan 2026, and with kids in the house it is the highest-stakes decision on this list.'},
+{n:2,id:'t2',title:'Fundamentals',when:'Months 1–3',img:'timer',steps:['s9','s10','s11','s12','s13','s14','s15'],
+ gate:'Gun, holster and safe.',exit:'Dot Torture 50/50 at 3 yd · Sheriff qual 15/15 · F.A.S.T. under 10.00',
+ sum:'Safe gun handling and a clean draw come before anyone puts you under stress. Dry fire does most of the work; live fire confirms it.'},
+{n:3,id:'t3',title:'Licensed',when:'Months 1–6, runs in parallel',img:'papers',steps:['s16','s17','s18','s19','s20'],
+ gate:'Application filed in Tier 0.',exit:'CCW card in hand, carry rules memorized.',
+ sum:'The Sheriff runs on its own clock: about 75 to 90 days from your appointment to conditional approval, then the course, then the card by mail.'},
+{n:4,id:'t4',title:'Immersion',when:'Months 3–9',img:'hero',steps:['s21','n1','s22','s23','s24','s25'],
+ gate:'Safe draw and Tier 2 standards met.',exit:'Gunsite Marksman · F.A.S.T. under 7.00 · Bill Drill under 3.50',
+ sum:'Leave home to train. Immersion first, then modern instructors who grade you against published standards.'},
+{n:5,id:'t5',title:'Force on Force',when:'Months 9–15',img:'mats',steps:['s26','n2','n3','n4','n5'],
+ gate:'Safe concealed draw and 6+ months of grappling.',exit:'ECQC complete, legal course done, advanced medical done.',
+ sum:'Unscripted fights against people who resist. This is where shooting skill becomes fighting skill.'},
+{n:6,id:'t6',title:'Mastery',when:'Year 2 onward',img:'night',steps:['n6','n7','s27','n9','n8','s28','s29','s30','n10'],
+ gate:'Gunsite 250 Marksman and ECQC.',exit:'Gunsite 499 · Gabe White Light pin · Rangemaster Baseline 190+ · USPSA classified',
+ sum:'Low light, advanced simulators, the hardest standards in the civilian world, and the option to teach. Then keep it: skill fades within weeks of stopping.'}
+];
+
+const SEQ = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s16','s10','s11','s12','s13','s14','s17','s15','s18','s19','s20','s21','n1','s22','s23','s24','s25','n5','s26','n2','n3','n4','n6','n7','s27','n9','n8','s28','s29','s30','n10'];
+
+const COURSES = [
+{id:'pwg-first',name:'Handgun First Steps',by:'PWG Range',tier:0,where:'Poway',drive:'25 min',cost:99,costL:'$99',ammo:'Gun and ammo included',prereq:'None',sched:'Runs often; book online',note:'Three hours on rental guns. The community default for true beginners.',url:'https://www.pwgrange.com/class/handgun-first-steps/',verdict:['p-ok','Start here']},
+{id:'fsc',name:'Firearm Safety Certificate',by:'Any California dealer',tier:0,where:'Any dealer',cost:25,costL:'$25',prereq:'None',sched:'Walk in',note:'30 questions, 23 to pass, valid 5 years.',url:'https://oag.ca.gov/firearms/fscfaqs'},
+{id:'pwg-dh',name:'Defensive Handgun',by:'PWG Range',tier:2,where:'Poway',drive:'25 min',cost:199,costL:'$199',prereq:'First Steps or equivalent',sched:'Runs often; book online',note:'The draw, malfunctions and California use of force. Leads to PWG\'s holster qualification.',url:'https://www.pwgrange.com/class/defensive-handgun/'},
+{id:'privates',name:'Private lessons ×3–4',by:'WCKS · H2K Defense · John Woo at PWG',tier:2,where:'Oceanside / San Diego / Poway',drive:'25 min',cost:500,costL:'$100–150/hr',costSub:'estimate',sched:'By appointment',note:'Fastest way to fix grip and trigger. Insist on a shot timer.'},
+{id:'wcks',name:'Level 1: strong-side and appendix draw',by:'West Coast Kinetic Solutions',tier:2,where:'Oceanside',drive:'25 min',costL:'Check',prereq:'Basic handling',sched:'Check schedule',note:'The class 2026 r/SanDiegoGuns posters recommend for real skill beyond the CCW checkbox.',verdict:['p-ok','Reddit pick']},
+{id:'lsd',name:'Law of Self Defense: Level 1 Core',by:'Andrew Branca · online',tier:2,where:'Online',drive:'Online',cost:90,costL:'~$90',sched:'Self-paced',note:'About 10 hours of video, with a free California supplement.',url:'https://lawofselfdefense.com/core'},
+{id:'stb',name:'Stop the Bleed',by:'Hospitals and EMS agencies',tier:2,where:'Countywide',cost:25,costL:'Free–$50',sched:'Frequent',note:'About two hours. Then carry a CAT Gen 7 or SOF-T Wide tourniquet.',url:'https://www.stopthebleed.org/'},
+{id:'efga',name:'Combat Match',by:'Escondido Fish & Game',tier:2,where:'Escondido',drive:'35 min',cost:20,costL:'$20',recur:'1st Saturday',sched:'1st Saturday, monthly',note:'Holster steel for beginners and intermediates. 7:00 start, mandatory 8:00 safety brief. Register on Practiscore.',url:'https://www.escondidofishandgame.com/events/combat-match/',verdict:['p-ok','First match']},
+{id:'pit',name:'CCW 16-hour course',by:'Practical Is Tactical · Jason Martin',tier:3,where:'Pala Range',drive:'40 min',cost:340,costL:'$340',prereq:'Sheriff conditional approval',note:'Unlimited guns, range fees included, Arizona and Utah permit certificates. Book through its USCCA listing.',dates:[['2026-11-21'],['2026-12-12'],['2027-01-09'],['2027-01-23']],verdict:['p-ok','Best value']},
+{id:'dgm',name:'CCW 16-hour course',by:'Discount Gun Mart · Kyle Dau',tier:3,where:'Morena Blvd, San Diego',drive:'25 min',cost:400,costL:'$400',prereq:'Sheriff conditional approval',sched:'Check schedule',note:'The most-endorsed local CCW instructor. Passing unlocks holster draws on DGM\'s range.',url:'https://range.discountgunmart.com/info/concealed-carry-courses',verdict:['p-ok','Most endorsed']},
+{id:'pwg-ca',name:'Concealed American (CCW)',by:'PWG Range',tier:3,where:'Poway',drive:'25 min',cost:499,costL:'$499',prereq:'Sheriff conditional approval',sched:'Check schedule',note:'Two days, up to three guns, closest to home.',url:'https://www.pwgrange.com/class/concealed-american-9/'},
+{id:'g250',name:'250 Defensive Pistol + Day Zero',by:'Gunsite Academy',tier:4,where:'Paulden, AZ',drive:'6 hr',cost:2385,costL:'$2,135 + $250',ammo:'~1,000 ball + 50 frangible',prereq:'None. Day Zero is for true beginners.',note:'Five days of immersion with simulators and a night shoot. Rents pistols ($35/day, $45 with a dot). Earn Marksman here.',conf:'Gunsite\'s own pages list slightly different 2027 dates. Confirm before booking.',dates:[['2026-11-30','2026-12-04'],['2027-01-11','2027-01-15'],['2027-02-01','2027-02-05'],['2027-03-08','2027-03-12','promo'],['2027-04-05','2027-04-09'],['2027-04-26','2027-04-30'],['2027-05-24','2027-05-28'],['2027-06-07','2027-06-11'],['2027-07-12','2027-07-16','promo'],['2027-08-02','2027-08-06','promo'],['2027-08-23','2027-08-27','promo'],['2027-09-13','2027-09-17','promo'],['2027-09-27','2027-10-01'],['2027-10-25','2027-10-29'],['2027-11-29','2027-12-03']],url:'https://www.gunsite.com/event/250-defensive-pistol-21/',verdict:['p-ok','Best on-ramp']},
+{id:'msp',name:'AIWB: Path to Performance',by:'Modern Samurai Project · Scott Jedlinski',tier:4,where:'Livermore, CA',drive:'7–8 hr',cost:600,costL:'$600',ammo:'700 rounds, 5 mags',prereq:'Pistol familiarity; Kydex AIWB holster with a claw. No Sig P320.',note:'Ends with a timed "Black Belt" standards test. The modern benchmark for red dot and appendix carry.',dates:[['2027-02-27','2027-02-28']],url:'https://shop.modernsamuraiproject.com/collections/all'},
+{id:'hyve-ed',name:'Essential Defense',by:'Tactical Hyve',tier:4,where:'Escondido (private range)',drive:'35 min',cost:750,costL:'$750',note:'Shoot/no-shoot decisions, medical, police contact and optional force-on-force.',dates:[['2027-01-30','2027-01-31']],url:'https://tacticalhyve.corsizio.com/'},
+{id:'taccon',name:'Rangemaster Tactical Conference',by:'Rangemaster · Tom Givens',tier:4,where:'Dallas, TX',drive:'Fly',costL:'Check',note:'The best single weekend to sample top instructors who rarely teach in the West. Use it to choose who you train with next.',dates:[['2027-04-02','2027-04-04']],url:'https://rangemaster.corsizio.com/'},
+{id:'bjj',name:'Grappling, twice a week',by:'Any reputable BJJ or no-gi gym',tier:4,where:'Local',cost:1200,costL:'$150–250/mo',costSub:'estimate',sched:'Ongoing',note:'Fights at contact distance start as wrestling. Grappling makes ECQC far more productive.'},
+{id:'ecqc',name:'Extreme Close Quarters Concepts',by:'ShivWorks · Craig Douglas',tier:5,where:'SoCal: Los Alamitos + Azusa',drive:'2 hr',cost:835,costL:'$775 + $60',ammo:'220 rounds',prereq:'Safe concealed draw, basic fitness. Mouthpiece and cup. No Sig P320.',note:'Full-contact, unscripted force-on-force. No 2027 SoCal date was posted as of '+VERIFIED+'; the Nov 20–22, 2026 run is too soon for you.',dates:[['2026-11-20','2026-11-22']],url:'https://shivworks.corsizio.com/',verdict:['p-warn','Month 9+']},
+{id:'hyve-fof',name:'Force on Force',by:'Tactical Hyve',tier:5,where:'Escondido',drive:'35 min',cost:750,costL:'$750',note:'Local marking-cartridge scenarios. A warm-up for ECQC.',dates:[['2027-03-27','2027-03-28']],url:'https://tacticalhyve.corsizio.com/'},
+{id:'mag20',name:'MAG-20 Classroom / MAG-40',by:'Massad Ayoob Group',tier:5,where:'Travel',drive:'Fly',cost:525,costL:'$525 / $1,000',sched:'No West Coast dates at last check',note:'The gold standard on the legal aftermath of a defensive shooting.'},
+{id:'med',name:'Two-day trauma care (e.g., DARC)',by:'Dark Angel Medical or similar',tier:5,where:'Travel or host',costL:'Check',sched:'No CA 2027 dates found',note:'The step past Stop the Bleed. Expect to travel or to host a class.'},
+{id:'g350',name:'350 Intermediate Pistol',by:'Gunsite Academy',tier:6,where:'Paulden, AZ',drive:'6 hr',cost:2345,costL:'$2,345',ammo:'~1,200 ball + 100 frangible',prereq:'250 at Marksman or higher',note:'Also offered with pistol-mounted optics, Jun 7–11, 2027.',dates:[['2027-01-18','2027-01-22'],['2027-03-08','2027-03-12'],['2027-04-12','2027-04-16'],['2027-06-07','2027-06-11','optics'],['2027-08-30','2027-09-03'],['2027-09-27','2027-10-01']],url:'https://www.gunsite.com/classes/350-intermediate-defensive-pistol-class/'},
+{id:'g350n',name:'350 Intermediate Pistol: Night',by:'Gunsite Academy',tier:6,where:'Paulden, AZ',drive:'6 hr',costL:'Check',prereq:'250 at Marksman or higher (confirm)',note:'The regular 350 curriculum with a low-light emphasis.',dates:[['2027-10-25','2027-10-29']],url:'https://www.gunsite.com/classes/350-lowlight/'},
+{id:'g499',name:'499 Advanced Pistol',by:'Gunsite Academy',tier:6,where:'Paulden, AZ',drive:'6 hr',cost:2575,costL:'$2,575',ammo:'1,100 ball + 250 frangible',prereq:'250 and 350, each at Marksman or higher',note:'Day and night live-fire simulators plus force-on-force with role players.',dates:[['2027-03-15','2027-03-19','so'],['2027-10-04','2027-10-08']],url:'https://www.gunsite.com/classes/499-advanced-defensive-pistol-class/',verdict:['p-sig','Summit']},
+{id:'gw',name:'Pistol Shooting Solutions',by:'Gabe White',tier:6,where:'Sorrento, LA (next listed)',drive:'Fly',cost:652,costL:'$651.53',prereq:'6-inch hits at 10 yd on demand; safe concealed draw. No Sig P320.',note:'Graded Dark, Light and Turbo pins. Western dates (Tucson, Sherwood OR) ran in 2026; watch for 2027.',dates:[['2027-04-24','2027-04-25']],url:'https://www.eventbrite.com/o/gabe-white-11847661128'},
+{id:'rm-cp',name:'Combative Pistol',by:'Rangemaster · Tom Givens',tier:6,where:'Lakeland, FL',drive:'Fly',cost:495,costL:'$495',note:'Two intensive days covering the essential skills of fighting with a handgun.',dates:[['2027-03-20','2027-03-21']],url:'https://rangemaster.corsizio.com/'},
+{id:'uspsa',name:'USPSA match',by:'Linea de Fuego',tier:6,where:'Pala Range',drive:'40 min',cost:50,costL:'$50/match',recur:'2nd & 4th Sundays',sched:'2nd and 4th Sundays',note:'Sanctioned, new shooters welcome. Shoot one a month for a year and get classified.',url:'https://lineadefuego.net'},
+{id:'rm-idc',name:'Protective Pistolcraft Instructor Development',by:'Rangemaster',tier:6,where:'Nashville, TN',drive:'Fly',cost:1350,costL:'$1,350',prereq:'None listed',note:'Optional instructor track: five days on stress, combative psychology and running a line.',dates:[['2027-07-19','2027-07-23']],url:'https://rangemaster.corsizio.com/'}
+];
+
+const BUDGET = {
+t0:[['Firearm Safety Certificate',25,25],['CCW application + Livescan',128.2,128.2],['PWG Handgun First Steps',99,99],['Range time and rentals',60,150]],
+t1:[['Bedside quick-access + main safe',400,1500,'est.'],['Pistol, red dot, DROS, taxes',1200,1500,'est.'],['Holster, belt, 5 magazines',300,500],['1,000 practice + 100 carry rounds',400,550,'est.'],['DOJ-listed car lockbox',50,120,'est.']],
+t2:[['PWG Gold: join + 3 months',347,347],['PWG Defensive Handgun',199,199],['Private lessons ×3–4',300,600,'est.'],['Dry-fire tools (MantisX, DryFireMag…)',100,500,'est.'],['Practice ammo, ~2,400 rounds',850,1000,'est.'],['Law of Self Defense',90,90],['Stop the Bleed, tourniquet, kit',50,150,'est.'],['First match',20,20]],
+t3:[['16-hour CCW course',340,499],['Final Sheriff + DOJ fee',140.8,140.8]],
+t4:[['Gunsite 250 + Day Zero',2385,2385],['250 ammo, ~1,050 rounds',380,450,'est.'],['Arizona travel and lodging',700,1500,'est.'],['Modern Samurai AIWB + 700 rounds',860,900,'est.'],['Livermore travel',500,900,'est.'],['Tactical Hyve Essential Defense',750,750],['TacCon tuition + Dallas travel',900,1800,'est.'],['Grappling, 6 months',900,1500,'est.']],
+t5:[['ShivWorks ECQC + range fee',835,835],['ECQC ammo and travel',380,700,'est.'],['Tactical Hyve Force on Force',750,750],['MAG-20 + travel',1300,2000,'est.'],['Two-day trauma care',300,600,'est.']],
+t6:[['Gunsite 350 + ~1,300 rounds',2845,2950,'est.'],['Gunsite 499 + ~1,350 rounds',3070,3200,'est.'],['Two more Arizona trips',1400,3000,'est.'],['Gabe White + travel',1450,2150,'est.'],['Rangemaster Combative Pistol + travel',1300,2000,'est.'],['USPSA ×12 + ammo',1250,1350,'est.'],['Utah nonresident permit',90,90],['First renewal (course + fees)',419,469]]
+};
+
+const SUGGEST = {'hyve-ed':'2027-01-30','msp':'2027-02-27','taccon':'2027-04-02','g250':'2027-04-26','g350':'2027-09-27','g350n':'2027-10-25'};
+
+/* ---------- STATE ---------- */
+const OLDSTEPS = Object.fromEntries(OLD.phases.flatMap(p=>p.steps).map(s=>[s.id,s]));
+const STEPS = Object.assign({}, OLDSTEPS, NEW_STEPS);
+(function patch(){
+  const s21 = STEPS.s21; if(s21&&s21.facts){ s21.facts = s21.facts.map(f=>f[0]==='Next'?['Next','Nov 30–Dec 4, 2026; 2027: Jan 11–15, Feb 1–5, Mar 8–12 (Bring-a-Buddy), Apr 5–9, Apr 26–30 · full list in Calendar']:f); }
+  const s27 = STEPS.s27; if(s27&&s27.facts){ s27.facts.push(['Next listed','Sorrento, LA, Apr 24–25, 2027 ($651.53)']); }
+  const s26 = STEPS.s26; if(s26&&s26.facts){ s26.facts.push(['2027','No SoCal date posted as of '+VERIFIED]); }
+})();
+const ALL = TIERS.flatMap(t=>t.steps);
+
+const LS = {
+  get(k,d){try{const v=localStorage.getItem('cl:'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('cl:'+k,JSON.stringify(v))}catch(e){}}
+};
+let ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},updatedAt:0}, LS.get('state',{}));
+const UI = {open:new Set(), cFilter:LS.get('cFilter','all'), cStatus:LS.get('cStatus','any'), hideDone:LS.get('hideDone',false), pFilter:LS.get('pFilter','all'), pQuery:'', zQuery:'', calAll:LS.get('calAll',false)};
+
+let remote = null, saveT = null, saving = false, pending = false;
+function setSync(mode,label){const el=document.getElementById('sync');el.className='sync '+mode;el.querySelector('span').textContent=label;}
+function commit(msg){
+  ST.updatedAt = Date.now();
+  LS.set('state',ST);
+  rerender();
+  if(msg) toast(msg);
+  if(remote){ clearTimeout(saveT); setSync('saving','Saving…'); saveT=setTimeout(flush,700); }
+}
+async function flush(){
+  if(!remote) return;
+  if(saving){pending=true;return;}
+  saving=true;
+  try{ await remote.set(JSON.parse(JSON.stringify(ST))); setSync('cloud','Saved to your account'); }
+  catch(e){ setSync('','Saved on this device'); }
+  saving=false; if(pending){pending=false;flush();}
+}
+async function connect(){
+  try{
+    if(!window.claude||!window.claude.use) return;
+    const [db,user] = await Promise.all([claude.use('db'),claude.use('user')]);
+    if(!db||!user) return;
+    const uid = await user.id(); if(!uid) return;
+    const ref = db.doc('data/users/'+uid+'/progress');
+    setSync('saving','Connecting…');
+    const timer = setTimeout(()=>setSync('','This device · cloud not reachable'),10000);
+    let first = true;
+    ref.onSnapshot(snap=>{
+      if(snap.metadata && snap.metadata.fromCache && first) return;
+      clearTimeout(timer);
+      remote = ref;
+      const d = snap.exists ? snap.data() : null;
+      if(first){
+        first=false;
+        if(d && (d.updatedAt||0) > (ST.updatedAt||0)){ ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender(); }
+        else if(ST.updatedAt>0){ flush(); }
+        setSync('cloud','Saved to your account');
+        return;
+      }
+      if(d && !snap.metadata.hasPendingWrites && (d.updatedAt||0) > (ST.updatedAt||0)){
+        ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{}}, JSON.parse(JSON.stringify(d))); LS.set('state',ST); rerender();
+      }
+    }, err=>{ clearTimeout(timer); remote=null; setSync('','Saved on this device'); });
+  }catch(e){}
+}
+
+/* ---------- HELPERS ---------- */
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const chev = '<svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const pd = s => { const [y,m,d]=s.split('-').map(Number); return new Date(Date.UTC(y,m-1,d)); };
+const fmtD = s => { const d=pd(s); return MON[d.getUTCMonth()]+' '+d.getUTCDate(); };
+const fmtR = r => r[1] ? (pd(r[0]).getUTCMonth()===pd(r[1]).getUTCMonth() ? fmtD(r[0])+'–'+pd(r[1]).getUTCDate() : fmtD(r[0])+'–'+fmtD(r[1])) : fmtD(r[0]);
+const yr = s => s.slice(0,4);
+const days = s => Math.round((pd(s)-pd(TODAY))/864e5);
+const money = n => '$'+Math.round(n).toLocaleString('en-US');
+const tierOf = id => TIERS.find(t=>t.steps.includes(id));
+const tierPct = t => t.steps.filter(id=>ST.done[id]).length / t.steps.length;
+const curTier = () => TIERS.find(t=>tierPct(t)<1) || TIERS[TIERS.length-1];
+const cstat = id => (ST.course[id]&&ST.course[id].s)||'';
+const cdate = id => ST.course[id]&&ST.course[id].d;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),1600);}
+function imgTag(name,alt,sm){return `<img src="img/${name}${sm?'-sm':''}.jpg" alt="${esc(alt)}" loading="${sm?'lazy':'eager'}" decoding="async" onerror="this.remove()">`;}
+
+/* ---------- OVERVIEW ---------- */
+function renderOverview(){
+  const v = document.getElementById('v-overview');
+  const n = ALL.filter(id=>ST.done[id]).length;
+  const ct = curTier();
+  const next = SEQ.filter(id=>!ST.done[id]).slice(0,3);
+  const booked = COURSES.filter(c=>cstat(c.id)==='booked'&&cdate(c.id)&&cdate(c.id)>=TODAY).sort((a,b)=>cdate(a.id).localeCompare(cdate(b.id)))[0];
+  const est = Object.values(BUDGET).flat().reduce((a,l)=>a+(l[1]+l[2])/2,0);
+  const spent = Object.values(ST.spent).reduce((a,x)=>a+(parseFloat(x)||0),0);
+  v.innerHTML = `
+  <div class="hero">${imgTag('hero','Outdoor desert pistol range at dawn with steel and silhouette targets')}
+    <div class="hero-in"><span class="eyebrow">San Diego County · ${VERIFIED} · 7 tiers · ${ALL.length} steps</span>
+      <h1>From first shot to the 499</h1>
+      <p>Every class, test, form and standard between a beginner rental lane and Gunsite's advanced course, in the order that works, with your progress saved as you go.</p></div></div>
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">Current tier</span><span class="v">${ct.n} · ${esc(ct.title)}</span><span class="s">${Math.round(tierPct(ct)*100)}% of this tier done</span></div>
+    <div class="stat"><span class="eyebrow">Steps done</span><span class="v">${n}<span class="mini"> / ${ALL.length}</span></span><span class="s">${Math.round(n/ALL.length*100)}% of the whole path</span></div>
+    <div class="stat"><span class="eyebrow">Next booked class</span>${booked?`<span class="v sm">${esc(booked.name)}</span><span class="s">${fmtD(cdate(booked.id))} · in ${days(cdate(booked.id))} days</span>`:`<span class="v sm">None yet</span><span class="s">Mark a class Booked in Classes</span>`}</div>
+    <div class="stat"><span class="eyebrow">Spent / estimate</span><span class="v">${money(spent)}</span><span class="s">of about ${money(est)} over 2+ years</span></div>
+  </div>
+  <h2 class="sec">Your next three moves</h2>
+  <div class="moves">${next.map((id,i)=>{const s=STEPS[id];const t=tierOf(id);return `<div class="move"><span class="k">${i===0?'Do this next':'Then'} · Tier ${t.n}</span><span class="h">${esc(s.title)}</span><span class="b">${s.one}</span><button class="btn ${i===0?'pri':''}" data-done="${id}">Mark done</button></div>`}).join('')||'<p class="lead">Every step is checked off. Keep the standards current.</p>'}</div>
+  <div class="callout hot"><span class="eyebrow">Critical path</span><p><strong>Apply for the license this week and buy the gun next week.</strong> The Sheriff's queue is the longest pole, and every gun on the license must already be recorded to you with DOJ. The 16-hour course comes last: the Sheriff only accepts training taken after conditional approval.</p></div>
+  <h2 class="sec">The ladder</h2>
+  <div class="ladder">${TIERS.slice().reverse().map(t=>{const p=tierPct(t);return `<a class="rung ${t===ct?'cur':''} ${p===1?'done':''}" href="#path" data-jump="${t.id}"><span class="n">${t.n}</span><span style="min-width:0"><span class="t">${esc(t.title)}</span><span class="w" style="display:block">${esc(t.when)} · exit: ${esc(t.exit)}</span><span class="meter"><i style="width:${p*100}%"></i></span></span><span class="pct">${t.steps.filter(id=>ST.done[id]).length}/${t.steps.length}</span></a>`}).join('')}</div>
+  <h2 class="sec">Timeline, Nov 2026 to Dec 2027</h2>
+  <p class="lead" style="font-size:14px;color:var(--muted)">Bars are the recommended window for each tier. Hollow markers are suggested class dates; solid markers are classes you've planned or booked.</p>
+  <div class="gantt-box">${gantt()}<div class="legend"><span><i style="background:var(--olive)"></i>Tier window</span><span><i style="background:var(--signal)"></i>Your class</span><span><i style="border:2px solid var(--signal)"></i>Suggested</span><span><i style="background:var(--ink);width:2px"></i>Today</span></div></div>`;
+  v.querySelectorAll('[data-done]').forEach(b=>b.addEventListener('click',()=>{ST.done[b.dataset.done]=true;commit('Marked done');}));
+  v.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',()=>{UI.jump=a.dataset.jump;}));
+}
+function gantt(){
+  const start=pd('2026-11-01'), end=pd('2028-01-01');
+  const W=900, L=128, R=12, top=26, rowH=30, H=top+TIERS.length*rowH+10;
+  const x = s => L + (pd(s)-start)/(end-start)*(W-L-R);
+  const win = {t0:['2026-11-15','2026-12-01'],t1:['2026-11-24','2026-12-24'],t2:['2026-12-01','2027-03-15'],t3:['2026-11-15','2027-05-31'],t4:['2027-01-15','2027-08-31'],t5:['2027-06-01','2027-12-31'],t6:['2027-08-15','2027-12-31']};
+  let g = '';
+  for(let i=0;i<=14;i++){const d=new Date(Date.UTC(2026,10+i,1));const s=d.toISOString().slice(0,10);const xx=x(s);
+    g+=`<line x1="${xx}" y1="${top-6}" x2="${xx}" y2="${H-6}" stroke="var(--line)" stroke-width="1"/>`;
+    if(i<14) g+=`<text x="${xx+4}" y="${top-10}" font-size="10.5">${MON[d.getUTCMonth()]}${d.getUTCMonth()===0?' ’'+String(d.getUTCFullYear()).slice(2):''}</text>`;}
+  TIERS.forEach((t,i)=>{const y=top+i*rowH;const w=win[t.id];const p=tierPct(t);
+    g+=`<text x="0" y="${y+18}" font-size="11.5" style="fill:var(--ink)">${t.n} ${esc(t.title)}</text>`;
+    g+=`<rect x="${x(w[0])}" y="${y+7}" width="${Math.max(4,x(w[1])-x(w[0]))}" height="14" rx="4" fill="color-mix(in srgb, var(--olive) 22%, transparent)"/>`;
+    g+=`<rect x="${x(w[0])}" y="${y+7}" width="${Math.max(0,(x(w[1])-x(w[0]))*p)}" height="14" rx="4" fill="var(--olive)"/>`;
+    if(t.id==='t6') g+=`<path d="M${x(w[1])-2} ${y+8} l8 6 l-8 6z" fill="color-mix(in srgb, var(--olive) 40%, transparent)"/>`;
+    COURSES.filter(c=>c.tier===t.n).forEach(c=>{const st=cstat(c.id);const d=cdate(c.id)||(!st&&SUGGEST[c.id]);if(!d||d<'2026-11-01'||d>='2028-01-01')return;
+      const solid=!!st; const cx=x(d);
+      g+=`<g><title>${esc(c.name)} · ${fmtD(d)}</title><circle cx="${cx}" cy="${y+14}" r="6" fill="${solid?'var(--signal)':'var(--surface)'}" stroke="var(--signal)" stroke-width="2"/></g>`;});
+  });
+  const tx=x(TODAY); g+=`<line x1="${tx}" y1="${top-4}" x2="${tx}" y2="${H-6}" stroke="var(--ink)" stroke-width="1.5"/><text x="${tx+4}" y="${H-8}" font-size="10" style="fill:var(--ink)">today</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tier timeline with class markers">${g}</svg>`;
+}
+
+/* ---------- PATH ---------- */
+function stepHTML(id){
+  const s=STEPS[id]; if(!s) return '';
+  const open=UI.open.has(id);
+  const facts = s.facts ? `<dl class="facts">${s.facts.map(f=>`<dt>${esc(f[0])}</dt><dd>${f[1]}</dd>`).join('')}</dl>` : '';
+  const links = s.links ? `<div class="links">${s.links.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])} ↗</a>`).join('')}</div>` : '';
+  return `<div class="step ${ST.done[id]?'done':''} ${open?'open':''}" data-step="${id}">
+    <input type="checkbox" class="check" id="c-${id}" data-id="${id}" ${ST.done[id]?'checked':''} aria-label="Mark done: ${esc(s.title)}">
+    <div class="st-main"><button class="st-head" aria-expanded="${open}"><span><span class="st-title">${esc(s.title)}${s.isNew?'<span class="pill p-sig new">New</span>':''}</span><span class="st-one">${s.one}</span></span>${chev}</button>
+    <div class="st-detail" ${open?'':'hidden'}>${s.body||''}${facts}${links}
+      <label class="eyebrow" for="note-${id}">Your notes</label><textarea class="note" id="note-${id}" data-note="${id}" placeholder="Dates, names, what you learned">${esc(ST.notes[id]||'')}</textarea></div></div></div>`;
+}
+function renderPath(){
+  const v=document.getElementById('v-path');
+  v.innerHTML = `<p class="lead">Seven tiers, each with a gate to enter and a measurable standard to leave. Tier 3 runs alongside Tiers 1 and 2 because the Sheriff sets that pace. Tap a step for details and notes; checkboxes save as you go.</p>
+  <div class="toolbar"><span class="eyebrow">${ALL.filter(id=>ST.done[id]).length} of ${ALL.length} steps done</span><label class="switch"><input type="checkbox" id="hideDone" ${UI.hideDone?'checked':''}> Hide finished steps</label></div>
+  ${TIERS.map(t=>{const p=tierPct(t);const cs=COURSES.filter(c=>c.tier===t.n);const steps=t.steps.filter(id=>!(UI.hideDone&&ST.done[id]));
+    return `<article class="tier" id="tier-${t.id}">
+      <div class="tier-band">${imgTag(t.img,t.title,false)}<div class="lab"><span class="eyebrow">Tier ${t.n} · ${t.steps.length} steps</span><h3>${esc(t.title)}</h3><span class="when">${esc(t.when)}</span></div></div>
+      <div class="tier-meta"><div><span class="eyebrow">Gate in</span>${esc(t.gate)}</div><div><span class="eyebrow">Exit standard</span>${esc(t.exit)}</div><div><span class="eyebrow">Budget (est.)</span>${budgetRange(t.id)}</div></div>
+      <p class="tier-sum">${t.sum}</p>
+      <div class="tier-prog"><span class="meter"><i style="width:${p*100}%"></i></span><span class="mini">${t.steps.filter(id=>ST.done[id]).length}/${t.steps.length}</span></div>
+      <div>${steps.map(stepHTML).join('')||'<p class="tier-sum">Everything in this tier is done.</p>'}</div>
+      ${cs.length?`<div class="tier-classes"><span class="eyebrow">Classes</span>${cs.map(c=>`<button class="chiplink" data-goc="${c.id}">${esc(c.name.length>34?c.name.slice(0,32)+'…':c.name)}${cstat(c.id)?' · '+cstat(c.id):''}</button>`).join('')}</div>`:''}
+    </article>`}).join('')}`;
+  v.querySelector('#hideDone').addEventListener('change',e=>{UI.hideDone=e.target.checked;LS.set('hideDone',UI.hideDone);renderPath();});
+  bindSteps(v);
+  v.querySelectorAll('[data-goc]').forEach(b=>b.addEventListener('click',()=>{UI.cFilter='all';UI.cStatus='any';UI.focusC=b.dataset.goc;location.hash='classes';}));
+  if(UI.jump){const el=document.getElementById('tier-'+UI.jump);UI.jump=null;if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),30);}
+}
+function bindSteps(v){
+  v.querySelectorAll('.check').forEach(c=>c.addEventListener('change',()=>{ST.done[c.dataset.id]=c.checked; if(!c.checked) delete ST.done[c.dataset.id]; commit(c.checked?'Done':'Unchecked');}));
+  v.querySelectorAll('.st-head').forEach(b=>b.addEventListener('click',()=>{const st=b.closest('.step');const id=st.dataset.step;const o=!UI.open.has(id);o?UI.open.add(id):UI.open.delete(id);st.classList.toggle('open',o);b.setAttribute('aria-expanded',o);st.querySelector('.st-detail').hidden=!o;}));
+  v.querySelectorAll('[data-note]').forEach(t=>{let tm;t.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{ST.notes[t.dataset.note]=t.value;ST.updatedAt=Date.now();LS.set('state',ST);if(remote){setSync('saving','Saving…');clearTimeout(saveT);saveT=setTimeout(flush,700);}},600);});});
+}
+function budgetRange(tid){const ls=BUDGET[tid]||[];const lo=ls.reduce((a,l)=>a+l[1],0),hi=ls.reduce((a,l)=>a+l[2],0);return lo===hi?money(lo):money(lo)+'–'+money(hi);}
+
+/* ---------- CLASSES ---------- */
+function renderClasses(){
+  const v=document.getElementById('v-classes');
+  const tierChips=[['all','All tiers'],...TIERS.map(t=>[String(t.n),t.n+' · '+t.title])];
+  const stChips=[['any','Any status'],['planned','Planned'],['booked','Booked'],['done','Done'],['none','Not chosen']];
+  v.innerHTML = `<p class="lead">Every class on the path, with prerequisites, ammo, cost and posted dates. Tap a date to pick it, then set the class to Planned, Booked or Done. Struck-through dates are sold out; green dates are promotional (Bring-a-Buddy: 50% off a friend's tuition).</p>
+  <div class="chips" role="group" aria-label="Filter by tier">${tierChips.map(c=>`<button class="chip" data-tf="${c[0]}" aria-pressed="${UI.cFilter===c[0]}">${esc(c[1])}</button>`).join('')}</div>
+  <div class="chips" role="group" aria-label="Filter by status">${stChips.map(c=>`<button class="chip" data-sf="${c[0]}" aria-pressed="${UI.cStatus===c[0]}">${esc(c[1])}</button>`).join('')}</div>
+  <div class="grid2" id="clist"></div>`;
+  v.querySelectorAll('[data-tf]').forEach(b=>b.addEventListener('click',()=>{UI.cFilter=b.dataset.tf;LS.set('cFilter',UI.cFilter);renderClasses();}));
+  v.querySelectorAll('[data-sf]').forEach(b=>b.addEventListener('click',()=>{UI.cStatus=b.dataset.sf;LS.set('cStatus',UI.cStatus);renderClasses();}));
+  const list = COURSES.filter(c=>(UI.cFilter==='all'||String(c.tier)===UI.cFilter)&&(UI.cStatus==='any'||(UI.cStatus==='none'?!cstat(c.id):cstat(c.id)===UI.cStatus)));
+  const box=v.querySelector('#clist');
+  box.innerHTML = list.length ? list.map(courseHTML).join('') : '<p class="empty">No classes match these filters.</p>';
+  box.querySelectorAll('[data-set]').forEach(b=>b.addEventListener('click',()=>{const [id,s]=b.dataset.set.split('|');const cur=ST.course[id]||{};if(!s){delete ST.course[id];}else{ST.course[id]=Object.assign({},cur,{s});}commit(s?('Marked '+s):'Cleared');}));
+  box.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{const [id,d]=b.dataset.pick.split('|');const cur=ST.course[id]||{};ST.course[id]={s:cur.s||'planned',d:cur.d===d?undefined:d};if(!ST.course[id].d)delete ST.course[id].d;commit(cur.d===d?'Date cleared':'Picked '+fmtD(d));}));
+  if(UI.focusC){const el=document.getElementById('course-'+UI.focusC);UI.focusC=null;if(el){setTimeout(()=>el.scrollIntoView({block:'center'}),30);}}
+}
+function courseHTML(c){
+  const st=cstat(c.id), sel=cdate(c.id);
+  const fut=(c.dates||[]).filter(r=>(r[1]||r[0])>=TODAY);
+  const t=TIERS[c.tier];
+  return `<article class="course ${st?'st-'+st:''}" id="course-${c.id}">
+    <div class="c-top"><div style="min-width:0"><div class="c-name">${esc(c.name)}</div><div class="c-by">${esc(c.by)}</div></div><div class="c-cost">${esc(c.costL||'')}${c.costSub?`<small>${esc(c.costSub)}</small>`:''}</div></div>
+    <div class="tags"><span class="pill p-acc">Tier ${t.n} · ${esc(t.title)}</span>${c.verdict?`<span class="pill ${c.verdict[0]}">${esc(c.verdict[1])}</span>`:''}<span class="pill p-n t">${esc(c.where)}${c.drive?' · '+esc(c.drive):''}</span></div>
+    <p class="c-note">${esc(c.note||'')}</p>
+    ${(c.prereq||c.ammo)?`<dl class="facts">${c.prereq?`<dt>Prereq</dt><dd>${esc(c.prereq)}</dd>`:''}${c.ammo?`<dt>Ammo</dt><dd>${esc(c.ammo)}</dd>`:''}${c.conf?`<dt>Note</dt><dd>${esc(c.conf)}</dd>`:''}</dl>`:''}
+    ${fut.length?`<div class="dates">${fut.map(r=>{const so=r[2]==='so';const pr=r[2]==='promo';const isSel=sel===r[0];return so?`<span class="date so" title="Sold out">${fmtR(r)} ’${yr(r[0]).slice(2)}</span>`:`<button class="date ${pr?'promo':''}" style="border:${isSel?'1.5px solid var(--signal)':'1.5px solid transparent'};cursor:pointer;color:inherit" data-pick="${c.id}|${r[0]}" aria-pressed="${isSel}" title="${pr?'Promotional class':r[2]==='optics'?'Optics version':'Pick this date'}">${isSel?'● ':''}${fmtR(r)} ’${yr(r[0]).slice(2)}${r[2]==='optics'?' · optics':''}</button>`}).join('')}</div>`:`<div class="mini">${esc(c.sched||c.recur||'Dates not posted')}</div>`}
+    <div class="seg" role="group" aria-label="Status">${[['','—'],['planned','Planned'],['booked','Booked'],['done','Done']].map(s=>`<button data-s="${s[0]}" data-set="${c.id}|${s[0]}" aria-pressed="${st===s[0]}">${s[1]}</button>`).join('')}</div>
+    ${c.url?`<div class="c-foot"><a href="${c.url}" target="_blank" rel="noopener">Registration page ↗</a>${sel?`<span class="mini">Your date: ${fmtD(sel)}, ${yr(sel)}</span>`:''}</div>`:''}
+  </article>`;
+}
+
+/* ---------- CALENDAR ---------- */
+function renderCalendar(){
+  const v=document.getElementById('v-calendar');
+  const evs=[];
+  COURSES.forEach(c=>(c.dates||[]).forEach(r=>{ if((r[1]||r[0])<TODAY) return; evs.push({c,r}); }));
+  evs.sort((a,b)=>a.r[0].localeCompare(b.r[0]));
+  const ct=curTier().n;
+  const shown = UI.calAll ? evs : evs.filter(e=>cstat(e.c.id)||e.c.tier<=ct+2);
+  const groups={}; shown.forEach(e=>{const k=e.r[0].slice(0,7);(groups[k]=groups[k]||[]).push(e);});
+  v.innerHTML = `<p class="lead">Every posted date from today through 2027. Classes more than two tiers above where you are now are hidden until you show all. A warning means you haven't finished the tier that class belongs to.</p>
+  <div class="toolbar"><span class="eyebrow">${shown.length} of ${evs.length} dated sessions · recurring matches below</span><label class="switch"><input type="checkbox" id="calAll" ${UI.calAll?'checked':''}> Show all tiers</label></div>
+  ${Object.keys(groups).map(k=>{const [y,m]=k.split('-').map(Number);return `<section class="month"><h3>${MON[m-1]} ${y}<span class="mini">${groups[k].length} session${groups[k].length>1?'s':''}</span></h3>${groups[k].map(e=>{const c=e.c,r=e.r,st=cstat(c.id),mine=cdate(c.id)===r[0];const pre=TIERS.slice(0,c.tier).every(t=>tierPct(t)===1);
+    const flags=[]; if(r[2]==='so')flags.push('<span class="pill p-no">Sold out</span>'); if(r[2]==='promo')flags.push('<span class="pill p-acc">Promo</span>'); if(r[2]==='optics')flags.push('<span class="pill p-n">Optics</span>');
+    if(mine&&st)flags.push(`<span class="pill p-sig">Yours · ${st}</span>`); else if(!pre&&c.tier>0)flags.push('<span class="pill p-warn">Finish tier '+(c.tier-1)+' first</span>');
+    return `<div class="ev"><div class="d">${fmtR(r)}<small>${days(r[0])<0?'in progress':'in '+days(r[0])+'d'}</small></div><div style="min-width:0"><div class="what">${esc(c.name)}</div><div class="where">${esc(c.by)} · ${esc(c.where)} · Tier ${c.tier}</div></div><div class="side">${flags.join('')}${r[2]==='so'?'':`<button class="btn" data-pick="${c.id}|${r[0]}">${mine?'Unpick':'Pick'}</button>`}</div></div>`}).join('')}</section>`}).join('')||'<p class="empty">No dated sessions to show. Turn on "Show all tiers".</p>'}
+  <h2 class="sec">Recurring</h2>
+  <section class="month">${COURSES.filter(c=>c.recur).map(c=>`<div class="ev"><div class="d">${esc(c.recur)}</div><div style="min-width:0"><div class="what">${esc(c.name)}</div><div class="where">${esc(c.by)} · ${esc(c.where)} · ${esc(c.costL)}</div></div><div class="side">${c.url?`<a href="${c.url}" target="_blank" rel="noopener" class="mini">Site ↗</a>`:''}</div></div>`).join('')}
+  <div class="ev"><div class="d">90 days before expiry</div><div style="min-width:0"><div class="what">CCW renewal window</div><div class="where">8-hour course, new Livescan, $77 + $93. Miss it and you start over.</div></div><div class="side"></div></div></section>`;
+  v.querySelector('#calAll').addEventListener('change',e=>{UI.calAll=e.target.checked;LS.set('calAll',UI.calAll);renderCalendar();});
+  v.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{const [id,d]=b.dataset.pick.split('|');const cur=ST.course[id]||{};if(cur.d===d){ST.course[id]={s:cur.s||'planned'};commit('Date cleared');}else{ST.course[id]={s:cur.s&&cur.s!=='done'?cur.s:'planned',d};commit('Planned for '+fmtD(d));}}));
+}
+
+/* ---------- STANDARDS ---------- */
+const DRILL_TIER = {sdq:3,dot:2,fast:2,bill:4,fail:4,casino:5,bad:6,wilson:6};
+function renderStandards(){
+  const v=document.getElementById('v-standards');
+  v.innerHTML = `<p class="lead">${OLD.drillsIntro.replace('Results stay on this device.','Every attempt is logged with its date, and your best lights up its tier.')}</p>
+  <div class="callout"><span class="eyebrow">Two more standards on the path</span><p><strong>Gunsite grades:</strong> Marksman or better at the 250 is the gate to the 350; Marksman in both is the gate to the 499. <strong>USPSA classification:</strong> D below 40%, C 40–60, B 60–75, A 75–85, M 85–95, GM 95 and up. Aim for C in your first classified year.</p></div>
+  <div class="grid2" id="dlist"></div>`;
+  const box=v.querySelector('#dlist');
+  box.innerHTML = OLD.drills.map(d=>{const logs=ST.logs[d.id]||[];const best=bestOf(d,logs);const hit=gradeIdx(d,best);
+    return `<article class="drill" id="d-${d.id}">
+      <div class="dr-top"><div style="min-width:0"><div class="dr-name">${esc(d.name)}</div><div class="dr-setup">${esc(d.setup)}</div></div><span class="pill p-acc">Tier ${DRILL_TIER[d.id]??''}</span></div>
+      <div class="pars" style="--n:${d.tiers.length}">${d.tiers.map((t,i)=>`<div class="par ${i===hit?'hit':''}"><div class="lbl">${esc(t[0])}</div><div class="v">${esc(t[1])}</div></div>`).join('')}</div>
+      <p class="dr-how">${d.how}</p>
+      <div class="logrow"><input id="in-${d.id}" inputmode="decimal" placeholder="${d.kind==='score'?'Score':'Seconds'}" aria-label="New ${d.kind==='score'?'score':'time'} for ${esc(d.name)}"><button class="btn pri" data-log="${d.id}">Log ${d.kind==='score'?'score':'time'}</button><span class="mini">${best==null?'No attempts yet':'Best '+best+(hit>=0?' · '+d.tiers[hit][0]:' · below first tier')}</span></div>
+      ${logs.length?`<div class="hist"><ol>${logs.slice(-5).reverse().map((l,i)=>`<li><span>${fmtD(l.d)} ’${l.d.slice(2,4)}</span><b>${l.v}</b><button aria-label="Delete entry" data-del="${d.id}|${logs.length-1-i}">×</button></li>`).join('')}</ol>${spark(d,logs)}</div>`:''}
+    </article>`}).join('');
+  box.querySelectorAll('[data-log]').forEach(b=>{const id=b.dataset.log;const inp=document.getElementById('in-'+id);
+    const go=()=>{const val=parseFloat(inp.value);if(isNaN(val)){toast('Enter a number first');return;}(ST.logs[id]=ST.logs[id]||[]).push({d:TODAY,v:val});commit('Logged '+val);};
+    b.addEventListener('click',go);inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});});
+  box.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{const [id,i]=b.dataset.del.split('|');ST.logs[id].splice(+i,1);commit('Entry deleted');}));
+}
+function bestOf(d,logs){if(!logs.length)return null;const vs=logs.map(l=>l.v);return d.kind==='score'?Math.max(...vs):Math.min(...vs);}
+function gradeIdx(d,v){if(v==null)return -1;let b=-1;d.tiers.forEach((t,i)=>{const n=t[2];if(n==null)return;if(d.kind==='score'?v>=n:v<=n)b=i;});return b;}
+function spark(d,logs){
+  const W=150,H=44,p=4; const vs=logs.map(l=>l.v); if(vs.length<2) return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><circle class="pt" cx="${W/2}" cy="${H/2}" r="3"/></svg>`;
+  const lo=Math.min(...vs),hi=Math.max(...vs),rg=(hi-lo)||1;
+  const pts=vs.map((v,i)=>[p+i*(W-2*p)/(vs.length-1), d.kind==='score'? H-p-(v-lo)/rg*(H-2*p) : p+(v-lo)/rg*(H-2*p)]);
+  const line=pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  const last=pts[pts.length-1];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="Trend over ${vs.length} attempts, higher is better"><line class="gd" x1="0" y1="${H-p}" x2="${W}" y2="${H-p}"/><path class="ar" d="${line} L${last[0]} ${H} L${pts[0][0]} ${H}Z"/><path class="ln" d="${line}"/><circle class="pt" cx="${last[0]}" cy="${last[1]}" r="3"/></svg>`;
+}
+
+/* ---------- BUDGET ---------- */
+function renderBudget(){
+  const v=document.getElementById('v-budget');
+  let tlo=0,thi=0,tsp=0;
+  const rows=TIERS.map(t=>{const ls=BUDGET[t.id];const lo=ls.reduce((a,l)=>a+l[1],0),hi=ls.reduce((a,l)=>a+l[2],0);const sp=parseFloat(ST.spent[t.id])||0;tlo+=lo;thi+=hi;tsp+=sp;return {t,ls,lo,hi,sp};});
+  const max=Math.max(...rows.map(r=>Math.max(r.hi,r.sp)));
+  v.innerHTML = `<p class="lead">What each tier costs, from posted tuition and fees plus marked estimates for gear, ammo and travel. Ammo is figured at about 35 to 40 cents a round with California taxes. Enter what you've actually spent per tier and the overview tracks it.</p>
+  <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><span class="eyebrow">Low estimate</span><span class="v">${money(tlo)}</span><span class="s">all 7 tiers</span></div><div class="stat"><span class="eyebrow">High estimate</span><span class="v">${money(thi)}</span><span class="s">all 7 tiers</span></div><div class="stat"><span class="eyebrow">You've spent</span><span class="v">${money(tsp)}</span><span class="s">${tsp?Math.round(tsp/((tlo+thi)/2)*100)+'% of midpoint':'Enter actuals below'}</span></div></div>
+  <div class="bars" aria-label="Estimate range and spending by tier">${rows.map(r=>`<div class="bar-row"><span class="lab">${r.t.n} ${esc(r.t.title)}</span><span class="trk"><span class="rng" style="left:${r.lo/max*100}%;width:${Math.max(.6,(r.hi-r.lo)/max*100)}%"></span><span class="spent" style="width:${r.sp/max*100}%"></span></span><span class="num">${money((r.lo+r.hi)/2)}</span></div>`).join('')}
+    <div class="legend" style="padding:2px 0 0"><span><i style="background:color-mix(in srgb,var(--olive) 35%,transparent)"></i>Estimate range</span><span><i style="background:var(--signal)"></i>Your spending</span></div></div>
+  <div class="ledger"><div class="lrow head"><span>Tier and line items</span><span class="num">Estimate</span><span class="num">You spent</span></div>
+  ${rows.map(r=>`<div class="lrow"><span class="nm">${r.t.n} · ${esc(r.t.title)}<small>${esc(r.t.when)}</small></span><span class="num">${r.lo===r.hi?money(r.lo):money(r.lo)+'–'+money(r.hi)}</span><span><input id="sp-${r.t.id}" inputmode="decimal" data-sp="${r.t.id}" value="${esc(ST.spent[r.t.id]??'')}" placeholder="$0" aria-label="Spent on tier ${r.t.n}"></span>
+    <div class="lines">${r.ls.map(l=>`<div><span>${esc(l[0])}${l[3]?' <em>(est.)</em>':''}</span><span>${l[1]===l[2]?money(l[1]):money(l[1])+'–'+money(l[2])}</span></div>`).join('')}</div></div>`).join('')}
+  <div class="lrow total"><span class="nm">Total</span><span class="num">${money(tlo)}–${money(thi)}</span><span class="num">${money(tsp)}</span></div></div>
+  <p class="foot">Excludes TacCon tuition and Gunsite 350 Night tuition, which weren't posted where checked. Travel figures assume driving to Arizona and flying elsewhere. Confidence: high on posted tuition and fees, moderate on ammo, low on travel.</p>`;
+  v.querySelectorAll('[data-sp]').forEach(i=>i.addEventListener('change',()=>{const n=parseFloat(String(i.value).replace(/[$,]/g,''));if(isNaN(n))delete ST.spent[i.dataset.sp];else ST.spent[i.dataset.sp]=n;commit('Saved');}));
+}
+
+/* ---------- RULES (ported) ---------- */
+function renderRules(){
+  const v=document.getElementById('v-rules');
+  const conf = c => c ? `<span class="pill ${c==='High'?'p-ok':c==='Moderate'?'p-warn':'p-no'}">${c} conf.</span>` : '';
+  v.innerHTML = `<p class="lead">${OLD.rulesIntro}</p>
+  <div class="card"><div class="card-h"><h3>Can I carry here?</h3><span class="mini" id="zcount"></span></div>
+  <div style="padding:10px 14px 4px"><input class="search" id="zq" type="search" placeholder="Try: bar, park, church, bank, Del Mar" autocomplete="off" value="${esc(UI.zQuery)}"></div><div id="zlist"></div></div>
+  <h2 class="sec">The fine print</h2>
+  <div class="view" style="gap:10px">${OLD.rules.map((r,i)=>`<div class="acc"><button class="acc-h" aria-expanded="false"><span>${esc(r.title)}</span><span style="display:flex;gap:8px;align-items:center">${conf(r.conf)}${chev}</span></button><div class="acc-b" hidden>${r.body}</div></div>`).join('')}</div>
+  <div class="sources"><span class="eyebrow">Sources</span><ol>${OLD.sources.map(s=>`<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join('')}</ol><p class="foot">${OLD.disclaimer}</p></div>`;
+  const draw=()=>{const cls={yes:['p-ok','Yes'],dep:['p-warn','Depends'],no:['p-no','No']};const q=UI.zQuery.toLowerCase();const list=OLD.zones.filter(z=>!q||(z.name+' '+z.note+' '+(z.alias||'')).toLowerCase().includes(q));
+    v.querySelector('#zcount').textContent=list.length+' places';
+    v.querySelector('#zlist').innerHTML=list.length?list.map(z=>`<div class="zone"><span class="zone-name">${esc(z.name)}</span><span class="pill ${cls[z.s][0]}">${cls[z.s][1]}</span><span class="zone-note">${z.note}</span></div>`).join(''):'<p class="empty">No match. Anywhere not listed follows private-property and posted-sign rules.</p>';};
+  v.querySelector('#zq').addEventListener('input',e=>{UI.zQuery=e.target.value;draw();});draw();
+  v.querySelectorAll('.acc-h').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement;const o=!a.classList.contains('open');a.classList.toggle('open',o);b.setAttribute('aria-expanded',o);a.querySelector('.acc-b').hidden=!o;}));
+}
+
+/* ---------- PLACES (ported) ---------- */
+function renderPlaces(){
+  const v=document.getElementById('v-places');
+  v.innerHTML = `<p class="lead">${OLD.placesIntro}</p>
+  <div class="chips" role="group" aria-label="Filter places">${OLD.placeTypes.map(t=>`<button class="chip" data-pf="${t[0]}" aria-pressed="${UI.pFilter===t[0]}">${t[1]}</button>`).join('')}</div>
+  <input class="search" id="pq" type="search" placeholder="Search name, city, or tag" autocomplete="off" value="${esc(UI.pQuery)}">
+  <div class="grid2" id="plist"></div>`;
+  const tl=Object.fromEntries(OLD.placeTypes);
+  const draw=()=>{const q=UI.pQuery.toLowerCase();const list=OLD.places.filter(p=>(UI.pFilter==='all'||p.type===UI.pFilter)&&(!q||(p.name+' '+p.where+' '+p.tags.join(' ')+' '+p.note).toLowerCase().includes(q))).sort((a,b)=>(a.mins??999)-(b.mins??999));
+    const box=v.querySelector('#plist');
+    box.innerHTML=list.length?list.map(p=>`<article class="place"><div class="pl-top"><div style="min-width:0"><div class="pl-name">${esc(p.name)}</div><div class="pl-where">${esc(p.where)}</div></div><div class="drive"><b>${p.drive}</b>${p.driveSub||''}</div></div>
+      <div class="tags"><span class="pill p-acc">${tl[p.type]}</span>${p.verdict?`<span class="pill ${p.verdict[0]}">${p.verdict[1]}</span>`:''}${p.tags.map(t=>`<span class="pill p-n t">${esc(t)}</span>`).join('')}</div>
+      <p class="pl-note">${p.note}</p>${p.more?`<p class="pl-note" hidden>${p.more}</p><button class="pl-more">More</button>`:''}
+      ${(p.url||p.cost)?`<div class="links" style="justify-content:space-between;align-items:baseline">${p.url?`<a href="${p.url}" target="_blank" rel="noopener">Website ↗</a>`:'<span></span>'}${p.cost?`<span class="mini">${p.cost}</span>`:''}</div>`:''}</article>`).join(''):'<p class="empty">Nothing matches. Clear the search or pick another filter.</p>';
+    box.querySelectorAll('.pl-more').forEach(b=>b.addEventListener('click',()=>{const m=b.previousElementSibling;m.hidden=!m.hidden;b.textContent=m.hidden?'More':'Less';}));};
+  v.querySelectorAll('[data-pf]').forEach(b=>b.addEventListener('click',()=>{UI.pFilter=b.dataset.pf;LS.set('pFilter',UI.pFilter);v.querySelectorAll('[data-pf]').forEach(x=>x.setAttribute('aria-pressed',x===b));draw();}));
+  v.querySelector('#pq').addEventListener('input',e=>{UI.pQuery=e.target.value;draw();});
+  draw();
+}
+
+/* ---------- ROUTER ---------- */
+const VIEWS=['overview','path','classes','calendar','standards','budget','rules','places'];
+const R={overview:renderOverview,path:renderPath,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,budget:renderBudget,rules:renderRules,places:renderPlaces};
+let cur='overview';
+function updateHeader(){const n=ALL.filter(id=>ST.done[id]).length;document.getElementById('hcount').innerHTML=`<b>${n}</b>/${ALL.length} steps`;}
+function rerender(){
+  updateHeader();
+  if(cur==='rules'||cur==='places') return;
+  const y=window.scrollY; R[cur](); window.scrollTo(0,y);
+}
+function show(){
+  const h=(location.hash||'').slice(1); const id=VIEWS.includes(h)?h:'overview'; const changed=id!==cur; cur=id;
+  VIEWS.forEach(x=>{document.getElementById('v-'+x).hidden=x!==id;});
+  document.querySelectorAll('.nav a').forEach(a=>a.setAttribute('aria-current',a.dataset.v===id?'page':'false'));
+  R[id](); updateHeader();
+  if(changed && !UI.jump && !UI.focusC) window.scrollTo({top:0});
+  const a=document.querySelector('.nav a[aria-current="page"]'); if(a&&a.scrollIntoView) a.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+window.addEventListener('hashchange',show);
+cur=null; show();
+setSync('', 'This device');
+connect();
+</script>

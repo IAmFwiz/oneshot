@@ -308,6 +308,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;opacity:0;transition:opacity .2s ease;pointer-events:none}
 .toast.on{opacity:1}
 @media (max-width:520px){#hcount{display:none}.wordmark{font-size:22px}}
+@media (max-width:560px){.lrow.shoprow{grid-template-columns:1fr!important}.lrow.shoprow .seg{justify-self:start}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -328,6 +329,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
       <a href="#calendar" data-v="calendar">Calendar</a>
       <a href="#standards" data-v="standards">Standards</a>
       <a href="#buy" data-v="buy">Buying Guide</a>
+      <a href="#shop" data-v="shop">Shopping List</a>
       <a href="#budget" data-v="budget">Budget</a>
       <a href="#rules" data-v="rules">Carry Rules</a>
       <a href="#places" data-v="places">Places</a>
@@ -344,6 +346,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
     <section class="view" id="v-calendar" hidden></section>
     <section class="view" id="v-standards" hidden></section>
     <section class="view" id="v-buy" hidden></section>
+    <section class="view" id="v-shop" hidden></section>
     <section class="view" id="v-budget" hidden></section>
     <section class="view" id="v-rules" hidden></section>
     <section class="view" id="v-places" hidden></section>
@@ -1046,8 +1049,8 @@ function renderPlaces(){
 }
 
 /* ---------- ROUTER ---------- */
-const VIEWS=['overview','path','fsc','classes','calendar','standards','buy','budget','rules','places'];
-const R={overview:renderOverview,path:renderPath,fsc:renderFsc,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,buy:renderBuy,budget:renderBudget,rules:renderRules,places:renderPlaces};
+const VIEWS=['overview','path','fsc','classes','calendar','standards','buy','shop','budget','rules','places'];
+const R={overview:renderOverview,path:renderPath,fsc:renderFsc,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,buy:renderBuy,shop:renderShop,budget:renderBudget,rules:renderRules,places:renderPlaces};
 let cur='overview';
 function updateHeader(){const n=ALL.filter(id=>ST.done[id]).length;document.getElementById('hcount').innerHTML=`<b>${n}</b>/${ALL.length} steps`;}
 function rerender(){
@@ -1162,7 +1165,7 @@ function renderBuy(){
   <div class="callout hot"><span class="eyebrow">Recommendation</span><p><strong>Buy one carry pistol first and train with only that gun through Tier 3.</strong> The Sig P365 X-Macro is the default. Add a pump shotgun or featureless AR for the house only after your Tier 2 standards are met and the safe has room. Every gun must be listed on your CCW to carry it, and each one costs 30 more qualification rounds.</p></div>
   <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><span class="eyebrow">Want</span><span class="v">${nWant}</span><span class="s">on your list</span></div><div class="stat"><span class="eyebrow">Bought</span><span class="v">${nGot}</span><span class="s">owned</span></div><div class="stat"><span class="eyebrow">Limit</span><span class="v">3 / 30 days</span><span class="s">any firearms, CCW or not</span></div></div>
   <div class="callout"><span class="eyebrow">At the counter, every time</span><p>FSC card (exempt once you hold a CCW) · age 21 · proof of residence · safe-handling demo · DROS $37.19 + 11% state excise + sales tax · 10-day wait, pick up within 30 days · the sale is recorded on video. Check any handgun's exact model number on the <a href="https://oag.ca.gov/firearms/certified-handguns/search" target="_blank" rel="noopener">DOJ roster</a> before you go.</p></div>
-  ${kitHTML()}
+  ${buyCallouts()}
   <h2 class="sec">Handguns</h2><div class="grid2">${B.handguns.map(buyCard).join('')}</div>
   <h2 class="sec">Skip these</h2>${list(B.avoid)}
   <h2 class="sec">Rifles</h2>
@@ -1211,7 +1214,7 @@ function kitHTML(){
   return `<h2 class="sec">Your Echelon 4.0C kit</h2>
   <div class="callout hot"><span class="eyebrow">Color</span><p><strong>Black only.</strong> Every Echelon on the DOJ roster is black, so a California dealer can't sell you a new desert/FDE one. Later you can have the slide Cerakoted or swap in a colored grip module.</p></div>
   <div class="callout"><span class="eyebrow">Don't wait too long</span><p>The DOJ roster marks every Echelon with an asterisk: it was added under the court order in <em>Boland v. Bonta</em>. If that order is overturned on appeal, these listings could come off the roster and dealers couldn't sell them new. Guns already bought stay legal.</p></div>
-  ${kitData().map(([g,items])=>`<div class="ledger"><div class="lrow head" style="grid-template-columns:1fr"><span>${esc(g)}</span></div>${items.map(it=>{const st=B[it[0]]||'';return `<div class="lrow" style="grid-template-columns:minmax(0,1fr) auto;align-items:start"><span class="nm">${esc(it[1])} <span class="pill ${it[4]}" style="margin-left:4px">${esc(it[5])}</span><small>${esc(it[2])}</small><small style="margin-top:4px;color:var(--ink);font-weight:400">${esc(it[3])}</small></span>
+  ${kitData().map(([g,items])=>`<div class="ledger"><div class="lrow head" style="grid-template-columns:1fr"><span>${esc(g)}</span></div>${items.map(it=>{const st=B[it[0]]||'';return `<div class="lrow shoprow" style="grid-template-columns:minmax(0,1fr) auto;align-items:start"><span class="nm">${esc(it[1])} <span class="pill ${it[4]}" style="margin-left:4px">${esc(it[5])}</span><small>${esc(it[2])}</small><small style="margin-top:4px;color:var(--ink);font-weight:400">${esc(it[3])}</small></span>
     <span class="seg" style="grid-template-columns:repeat(3,auto);min-width:0" role="group" aria-label="Status">${[['','—'],['want','Want'],['bought','Got it']].map(s=>`<button data-s="${s[0]==='bought'?'done':s[0]}" data-buy="${it[0]}|${s[0]}" aria-pressed="${st===s[0]}" style="padding:6px 8px">${s[1]}</button>`).join('')}</span></div>`}).join('')}</div>`).join('')}
   <p class="foot">Prices and stock are from WBT Guns (wbtguns.com), Nov 17, 2026, or are marked as ranges. Call WBT at (619) 667-9453 to confirm before you drive out.</p>`;
 }
@@ -1487,4 +1490,66 @@ function renderFsc(){
   const qc=v.querySelector('#qclose'); if(qc) qc.addEventListener('click',()=>{QZ=null;renderFsc();});
   v.querySelectorAll('.acc-h').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement;const o=!a.classList.contains('open');a.classList.toggle('open',o);b.setAttribute('aria-expanded',o);a.querySelector('.acc-b').hidden=!o;}));
 }
+
+/* ---------- SHOPPING LIST ---------- */
+/* [id, item, best pick, where, low, high, note, tag, alternatives] */
+function shopData(){ return [
+ ['The gun',[
+  ['k-gun','Springfield Echelon 4.0C (CA)','Gear Pac (EC9409BCA-PAC): gun + extra mags + bag + green dot','WBT Guns, La Mesa · in stock',749.99,749.99,'Base gun (EC9409BCA-U) is $649.99, also in stock. Confirm the Gear Pac contents with WBT: (619) 667-9453.','Required','Base gun $649.99 + 3 mags if you want no dot at all'],
+  ['k-mags','Spare magazines (5 total for classes)','Springfield OEM 4.0C 10-round, EC6010C','WBT · $39.99 each · in stock',39.99,119.97,'1 more with the Gear Pac, 3 with the base gun. Factory mags only; skip ProMag.','Required','']
+ ]],
+ ['Storage (required by law)',[
+  ['k-safe','Bedside quick-access lock box','Vaultek VS20i: fingerprint + keypad + key','Vaultek, Amazon, sporting goods',260,300,'On the DOJ certified list. Opens fast by touch in the dark, bolts to the nightstand or floor. Check it fits the Echelon with the TLR-8 mounted.','Required','Fort Knox Pistol Box FKPB: mechanical push-button lock, no batteries, heaviest steel (DOJ-listed, est. $250–350). Hornady RAPiD Night Guard 98215: RFID tap to open (DOJ-listed, est. ~$300).'],
+  ['k-lockbox','Car lock box','Vaultek LifePod (VLP10 or XR)','Vaultek, Amazon',150,250,'DOJ-listed. For places you can\'t carry: cable it to the seat frame, out of view. Confirm the gun fits with the light; if not, the Fort Knox FKPB (11 × 9 × 3 in. interior) will.','Required',''],
+  ['k-main','Full gun safe (when you add a long gun)','A DOJ-listed safe from Liberty, Cannon or SentrySafe, bolted to the floor','Local safe dealer',1000,3000,'Not needed for one pistol in the bedside box. Buy it before a shotgun or AR comes home.','Later','']
+ ]],
+ ['Light, laser and carry',[
+  ['k-laser','Weapon light + laser','Streamlight TLR-8 A G (500 lumens, green laser)','Order online, or ask WBT to order it',280,350,'Get the full-size "A" version with the 1913 rail key; the Sub models don\'t list the Echelon. Zero the laser at 7–10 yards.','Your pick',''],
+  ['k-holster','Light-bearing holster','Four Brothers Echelon 4.0C + TLR-8A IWB','fourbrothersinc.com',80,120,'Holds the light, so the gun won\'t fit without it. Ask whether it can be set up for appendix carry. Check T.Rex Arms\' holster finder as a second option.','Required',''],
+  ['k-belt','Gun belt','1.5" stiff EDC belt','Online',60,120,'A sagging belt ruins concealment and draw.','Required',''],
+  ['k-sights','Night sights','Only if the factory sights aren\'t tritium','WBT: TruGlo Tritium Pro $79.99, Trijicon HD $149.99',0,150,'Check the Gear Pac first: retailers list it with night sights.','If needed','']
+ ]],
+ ['Ammunition',[
+  ['k-ammo','Practice ammo','1,000 rounds 9mm 115–124 gr FMJ','Any CA vendor (in person, eligibility check)',350,400,'First purchase needs the $19 eligibility check; $5 after that.','Required',''],
+  ['k-jhp','Carry ammo','100 rounds Speer Gold Dot, Federal HST or Winchester Ranger T','Same',80,130,'Shoot at least 50 through your gun to confirm it feeds.','Required','']
+ ]],
+ ['Range and training',[
+  ['k-ppe','Eye and ear protection','Electronic earmuffs + ANSI Z87 glasses','Any sporting goods store',60,150,'Electronic muffs let you hear range commands.','Required',''],
+  ['k-dry','Dry-fire kit','Orange dummy rounds + MantisX trainer','Online',165,275,'Dummy rounds for drills; MantisX shows grip and trigger mistakes.','Recommended',''],
+  ['k-timer','Shot timer','Any dedicated shot timer','Online',100,200,'Every standard on the path is timed.','Recommended',''],
+  ['k-clean','Cleaning kit','Pistol cleaning kit + gun oil','WBT or any gun store',30,60,'The guide says clean the barrel after every use.','Recommended',''],
+  ['k-tq','Tourniquet','CAT Gen 7 or SOF-T Wide','Buy from the maker or North American Rescue',30,40,'Counterfeits are common on marketplaces; buy direct.','Recommended','']
+ ]]
+]; }
+function feesData(){ return [['FSC test',25],['DROS fee',37.19],['CA excise (11%) + sales tax (~8–9%) on $750',145],['First ammo eligibility check',19],['PWG Handgun First Steps',99],['CCW application + Livescan',128.2]]; }
+function renderShop(){
+  const v=document.getElementById('v-shop'); const B=ST.buy||{}; const D=shopData(); const FEES=feesData();
+  const all=D.flatMap(g=>g[1]); const mid=it=>(it[4]+it[5])/2;
+  const now=all.filter(it=>it[7]!=='Later');
+  const need=now.filter(it=>B[it[0]]!=='bought'), got=now.filter(it=>B[it[0]]==='bought');
+  const fees=FEES.reduce((a,f)=>a+f[1],0);
+  v.innerHTML = `<p class="lead">Everything to buy for the Echelon, in buying order, with one best pick for each item. Storage devices are checked against the DOJ roster of certified firearm safety devices. Mark items Want, Ordered or Got it; the totals update.</p>
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">Left to buy</span><span class="v">${money(need.reduce((a,it)=>a+mid(it),0))}</span><span class="s">${need.length} item${need.length===1?'':'s'}, midpoint est.</span></div>
+    <div class="stat"><span class="eyebrow">Bought</span><span class="v">${got.length}<span class="mini"> / ${now.length}</span></span><span class="s">items checked off</span></div>
+    <div class="stat"><span class="eyebrow">Gear total</span><span class="v">${money(now.reduce((a,it)=>a+it[4],0))}–${money(now.reduce((a,it)=>a+it[5],0)).slice(1)}</span><span class="s">excluding the later full safe</span></div>
+    <div class="stat"><span class="eyebrow">Fees and taxes</span><span class="v">${money(fees)}</span><span class="s">FSC, DROS, tax, first class, CCW</span></div>
+  </div>
+  <div class="callout hot"><span class="eyebrow">Buy the safe first</span><p>California requires the gun to be locked up whenever it isn't on you or within reach (PC 25145). Have the bedside box installed before pickup day; bring its receipt to WBT and you won't need the cable lock they'd otherwise hand you.</p></div>
+  ${D.map(([g,items])=>`<div class="ledger"><div class="lrow head" style="grid-template-columns:minmax(0,1fr) auto"><span>${esc(g)}</span><span>${money(items.reduce((a,it)=>a+it[4],0))}–${money(items.reduce((a,it)=>a+it[5],0)).slice(1)}</span></div>
+   ${items.map(it=>{const st=B[it[0]]||'';const pr=it[4]===it[5]?money(it[4]):money(it[4])+'–'+money(it[5]).slice(1);return `<div class="lrow shoprow" style="grid-template-columns:minmax(0,1fr) auto;align-items:start;${st==='bought'?'opacity:.6':''}">
+    <span class="nm">${esc(it[1])} <span class="pill ${it[7]==='Required'?'p-ok':it[7]==='Later'?'p-n':it[7]==='Your pick'?'p-sig':'p-acc'}" style="margin-left:4px">${esc(it[7])}</span>
+      <small style="color:var(--ink);font-weight:600;margin-top:3px">Best pick: ${esc(it[2])}</small>
+      <small>${esc(it[3])} · <span style="font-family:var(--f-mono)">${pr}</span></small>
+      <small style="margin-top:3px">${esc(it[6])}</small>${it[8]?`<small style="margin-top:3px"><em>Alternatives:</em> ${esc(it[8])}</small>`:''}</span>
+    <span class="seg" style="grid-template-columns:repeat(4,auto);min-width:0" role="group" aria-label="Status">${[['','—'],['want','Want'],['ordered','Ordered'],['bought','Got it']].map(s=>`<button data-s="${s[0]==='bought'?'done':s[0]}" data-buy="${it[0]}|${s[0]}" aria-pressed="${st===s[0]}" style="padding:6px 7px">${s[1]}</button>`).join('')}</span></div>`}).join('')}</div>`).join('')}
+  <div class="ledger"><div class="lrow head" style="grid-template-columns:minmax(0,1fr) auto"><span>Fees and taxes (not gear)</span><span>${money(fees)}</span></div>
+   ${FEES.map(f=>`<div class="lrow" style="grid-template-columns:minmax(0,1fr) auto"><span class="nm" style="font-weight:500">${esc(f[0])}</span><span class="num">${money(f[1])}</span></div>`).join('')}</div>
+  <p class="foot">WBT prices and stock checked Nov 17, 2026. Other prices are estimates; confirm before buying. Every lock box named here appears on the DOJ roster of certified firearm safety devices (oag.ca.gov/firearms/fsdcertlist) as of the same date; DOJ does not list interior sizes for every model, so confirm your pistol fits with the light mounted.</p>`;
+  v.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{const [id,s]=b.dataset.buy.split('|');ST.buy=ST.buy||{};if(!s)delete ST.buy[id];else ST.buy[id]=s;commit(s==='bought'?'Checked off':s==='ordered'?'Marked ordered':s?'Added to your list':'Cleared');}));
+}
+function buyCallouts(){ return `<h2 class="sec">Your Echelon 4.0C</h2>
+  <div class="callout hot"><span class="eyebrow">Color</span><p><strong>Black only.</strong> Every Echelon on the DOJ roster is black, so a California dealer can't sell you a new desert/FDE one. Later you can have the slide Cerakoted or swap in a colored grip module.</p></div>
+  <div class="callout"><span class="eyebrow">Don't wait too long</span><p>The DOJ roster marks every Echelon with an asterisk: it was added under the court order in <em>Boland v. Bonta</em>. If that order is overturned on appeal, these listings could come off the roster and dealers couldn't sell them new. Guns already bought stay legal.</p></div>
+  <div><a class="btn pri" href="#shop" style="text-decoration:none;display:inline-block">Open the shopping list for the Echelon →</a></div>`; }
 </script>

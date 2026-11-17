@@ -653,17 +653,17 @@ links:[['Rangemaster registration','https://rangemaster.corsizio.com/']]}
 };
 
 const TIERS = [
-{n:0,id:'t0',title:'Orientation',when:'Weeks 1–2',img:'lane',steps:['s1','s2','s3','s4'],
- gate:'Nothing. Start today.',exit:'FSC passed, CCW application filed, carry gun chosen on a timer.',
+{n:0,id:'t0',title:'Orientation',when:'Weeks 1–2',img:'lane',steps:['s1','s2','s4','s3'],
+ gate:'Nothing. Start today.',exit:'FSC passed, CCW Pro account and documents ready, carry gun chosen on a timer.',
  sum:'Learn on rental guns before you own one, and start the license clock on day one.'},
-{n:1,id:'t1',title:'Equip & Secure',when:'Weeks 2–4',img:'gear',steps:['s5','s6','s7','s8'],
- gate:'Firearm Safety Certificate in hand.',exit:'Gun recorded to you, locked storage installed, holster, belt, 5 mags, 1,000 rounds.',
+{n:1,id:'t1',title:'Equip & Secure',when:'Weeks 2–4',img:'gear',steps:['s5','s6','n12','s7','s8'],
+ gate:'Firearm Safety Certificate in hand.',exit:'Gun bought, CCW application submitted with it, locked storage, holster, belt, 5 mags, 1,000 rounds.',
  sum:'The safe goes in before the gun comes home. Locked storage is mandatory in California since Jan 2026, and with kids in the house it is the highest-stakes decision on this list.'},
 {n:2,id:'t2',title:'Fundamentals',when:'Months 1–3',img:'timer',steps:['s9','s10','s11','s12','s13','s14','s15'],
  gate:'Gun, holster and safe.',exit:'Dot Torture 50/50 at 3 yd · Sheriff qual 15/15 · F.A.S.T. under 10.00',
  sum:'Safe gun handling and a clean draw come before anyone puts you under stress. Dry fire does most of the work; live fire confirms it.'},
 {n:3,id:'t3',title:'Licensed',when:'Months 1–6, runs in parallel',img:'papers',steps:['s16','s17','s18','s19','s20'],
- gate:'Application filed in Tier 0.',exit:'CCW card in hand, carry rules memorized.',
+ gate:'Application submitted in Tier 1, the day you have a serial number.',exit:'CCW card in hand, carry rules memorized.',
  sum:'The Sheriff runs on its own clock: about 75 to 90 days from your appointment to conditional approval, then the course, then the card by mail.'},
 {n:4,id:'t4',title:'Immersion',when:'Months 3–9',img:'hero',steps:['s21','n1','s22','s23','s24','s25','n11'],
  gate:'Safe draw and Tier 2 standards met.',exit:'Gunsite Marksman · F.A.S.T. under 7.00 · Bill Drill under 3.50',
@@ -676,7 +676,7 @@ const TIERS = [
  sum:'Low light, advanced simulators, the hardest standards in the civilian world, and the option to teach. Then keep it: skill fades within weeks of stopping.'}
 ];
 
-const SEQ = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s16','s10','s11','s12','s13','s14','s17','s15','s18','s19','s20','s21','n1','s22','s23','s24','s25','n11','n5','s26','n2','n3','n4','n6','n7','s27','n9','n8','s28','s29','s30','n10'];
+const SEQ = ['s3','s1','s2','s4','s5','s6','n12','s7','s8','s9','s16','s10','s11','s12','s13','s14','s17','s15','s18','s19','s20','s21','n1','s22','s23','s24','s25','n11','n5','s26','n2','n3','n4','n6','n7','s27','n9','n8','s28','s29','s30','n10'];
 
 const COURSES = [
 {id:'pwg-first',name:'Handgun First Steps',by:'PWG Range',tier:0,where:'Poway',drive:'25 min',cost:99,costL:'$99',ammo:'Gun and ammo included',prereq:'None',sched:'Runs often; book online',note:'Three hours on rental guns. The community default for true beginners.',url:'https://www.pwgrange.com/class/handgun-first-steps/',verdict:['p-ok','Start here']},
@@ -709,8 +709,8 @@ const COURSES = [
 ];
 
 const BUDGET = {
-t0:[['Firearm Safety Certificate',25,25],['CCW application + Livescan',128.2,128.2],['PWG Handgun First Steps',99,99],['Range time and rentals',60,150]],
-t1:[['Bedside quick-access + main safe',400,1500,'est.'],['Pistol, red dot, DROS, taxes',1200,1500,'est.'],['Holster, belt, 5 magazines',300,500],['1,000 practice + 100 carry rounds',400,550,'est.'],['DOJ-listed car lockbox',50,120,'est.']],
+t0:[['Firearm Safety Certificate',25,25],['PWG Handgun First Steps',99,99],['Range time and rentals',60,150]],
+t1:[['CCW application + Livescan',128.2,128.2],['Bedside quick-access + main safe',400,1500,'est.'],['Pistol, red dot, DROS, taxes',1200,1500,'est.'],['Holster, belt, 5 magazines',300,500],['1,000 practice + 100 carry rounds',400,550,'est.'],['DOJ-listed car lockbox',50,120,'est.']],
 t2:[['PWG Gold: join + 3 months',347,347],['PWG Defensive Handgun',199,199],['Private lessons ×3–4',300,600,'est.'],['Dry-fire tools (MantisX, DryFireMag…)',100,500,'est.'],['Practice ammo, ~2,400 rounds',850,1000,'est.'],['Law of Self Defense',90,90],['Stop the Bleed, tourniquet, kit',50,150,'est.'],['First match',20,20]],
 t3:[['16-hour CCW course',340,499],['Final Sheriff + DOJ fee',140.8,140.8]],
 t4:[['Gunsite 250 + Day Zero',2385,2385],['Home long gun (pump or featureless AR)',450,1800,'est.'],['250 ammo, ~1,050 rounds',380,450,'est.'],['Arizona travel and lodging',700,1500,'est.'],['Modern Samurai AIWB + 700 rounds',860,900,'est.'],['Livermore travel',500,900,'est.'],['Tactical Hyve Essential Defense',750,750],['TacCon tuition + Dallas travel',900,1800,'est.'],['Grappling, 6 months',900,1500,'est.']],
@@ -724,6 +724,15 @@ const SUGGEST = {'hyve-ed':'2027-01-30','msp':'2027-02-27','taccon':'2027-04-02'
 const OLDSTEPS = Object.fromEntries(OLD.phases.flatMap(p=>p.steps).map(s=>[s.id,s]));
 const STEPS = Object.assign({}, OLDSTEPS, NEW_STEPS);
 (function patch(){
+  Object.assign(STEPS.s1,{short:'CCW Pro account',title:'Open your CCW Pro account and gather documents',one:'Do everything but submit. The portal needs a gun before it accepts the application.',
+   body:`<p>Create the account now and fill in every section you can: personal history, residence, employment, references. CCW Pro won't let you submit until a firearm is entered, so the submit step moves to Tier 1, right after you buy. Having the rest done means you can submit within minutes of getting the serial number.</p>
+   <ul><li>References: three. If you're married, your spouse must be one of them, and a spouse satisfies both reference rules.</li><li>Disclose everything. Since Jan 2026 (AB 1078), inaccurate or incomplete answers require denial or revocation.</li><li>Cannabis use is a disqualifier.</li><li>Scan two monthly proofs of residence (utility, phone, bank; no P.O. box) and your CA license.</li></ul>`,
+   facts:[['Portal','CCW Pro (replaced Permitium in 2024)'],['Contact','ccw@sdsheriff.org · 858-974-2020']]});
+  NEW_STEPS.n12 = STEPS.n12 = {id:'n12',short:'Submit CCW',title:'Submit the CCW application with your new gun',one:'Enter make, model, caliber and serial from your purchase paperwork, then book the earliest appointment.',isNew:true,
+   body:`<p>The dealer's purchase paperwork lists the make, model, caliber and serial number. Enter them in CCW Pro the day you buy, submit, pay the first fees, and book the earliest appointment shown. Then check the portal several times a day for cancellations; 2025 applicants who did this pulled their appointments in from months to days.</p>
+   <ul><li><strong>Unconfirmed:</strong> whether the Sheriff accepts the gun before your 10-day wait ends, or only after pickup when it's recorded to you with DOJ. If the portal or staff refuse it on purchase day, submit on pickup day. Ask ccw@sdsheriff.org to be sure.</li><li>The gun must be registered in your name by the interview.</li><li>You can add up to two more guns later (license modifications, $10 each).</li></ul>`,
+   facts:[['Pay now','$128.20 ($35.20 Sheriff + $93 Livescan)'],['Delay vs. old plan','0 to 10 days'],['Contact','ccw@sdsheriff.org · 858-974-2020']],
+   links:[['CCW Pro portal','https://ccw-sdsd.cssa.cloud'],['Sheriff CCW page','https://www.sdsheriff.gov/i-want-to/get-a-permit-or-license/regulatory-licenses-and-fees/concealed-weapons-license']]};
   const s21 = STEPS.s21; if(s21&&s21.facts){ s21.facts = s21.facts.map(f=>f[0]==='Next'?['Next','Nov 30–Dec 4, 2026; 2027: Jan 11–15, Feb 1–5, Mar 8–12 (Bring-a-Buddy), Apr 5–9, Apr 26–30 · full list in Calendar']:f); }
   const s27 = STEPS.s27; if(s27&&s27.facts){ s27.facts.push(['Next listed','Sorrento, LA, Apr 24–25, 2027 ($651.53)']); }
   const s26 = STEPS.s26; if(s26&&s26.facts){ s26.facts.push(['2027','No SoCal date posted as of '+VERIFIED]); }
@@ -823,7 +832,7 @@ function renderOverview(){
   </div>
   <h2 class="sec">Your next three moves</h2>
   <div class="moves">${next.map((id,i)=>{const s=STEPS[id];const t=tierOf(id);return `<div class="move"><span class="k">${i===0?'Do this next':'Then'} · Tier ${t.n}</span><span class="h">${esc(s.title)}</span><span class="b">${s.one}</span><button class="btn ${i===0?'pri':''}" data-done="${id}">Mark done</button></div>`}).join('')||'<p class="lead">Every step is checked off. Keep the standards current.</p>'}</div>
-  <div class="callout hot"><span class="eyebrow">Critical path</span><p><strong>Apply for the license this week and buy the gun next week.</strong> The Sheriff's queue is the longest pole, and every gun on the license must already be recorded to you with DOJ. The 16-hour course comes last: the Sheriff only accepts training taken after conditional approval.</p></div>
+  <div class="callout hot"><span class="eyebrow">Critical path</span><p><strong>Pass the FSC and buy the gun this week, then submit the CCW application the same day.</strong> CCW Pro won't accept an application without a gun on it, so the purchase is now the first domino. The Sheriff's queue is still the longest pole. The 16-hour course comes last: the Sheriff only accepts training taken after conditional approval.</p></div>
   <h2 class="sec">The ladder</h2>
   <div class="ladder">${TIERS.slice().reverse().map(t=>{const p=tierPct(t);return `<a class="rung ${t===ct?'cur':''} ${p===1?'done':''}" href="#path" data-jump="${t.id}"><span class="n">${t.n}</span><span style="min-width:0"><span class="t">${esc(t.title)}</span><span class="w" style="display:block">${esc(t.when)} · exit: ${esc(t.exit)}</span><span class="meter"><i style="width:${p*100}%"></i></span></span><span class="pct">${t.steps.filter(id=>ST.done[id]).length}/${t.steps.length}</span></a>`}).join('')}</div>
   <h2 class="sec">Timeline, Nov 2026 to Dec 2027</h2>
@@ -836,7 +845,7 @@ function gantt(){
   const start=pd('2026-11-01'), end=pd('2028-01-01');
   const W=900, L=128, R=12, top=26, rowH=30, H=top+TIERS.length*rowH+10;
   const x = s => L + (pd(s)-start)/(end-start)*(W-L-R);
-  const win = {t0:['2026-11-15','2026-12-01'],t1:['2026-11-24','2026-12-24'],t2:['2026-12-01','2027-03-15'],t3:['2026-11-15','2027-05-31'],t4:['2027-01-15','2027-08-31'],t5:['2027-06-01','2027-12-31'],t6:['2027-08-15','2027-12-31']};
+  const win = {t0:['2026-11-15','2026-12-01'],t1:['2026-11-24','2026-12-24'],t2:['2026-12-01','2027-03-15'],t3:['2026-11-24','2027-06-15'],t4:['2027-01-15','2027-08-31'],t5:['2027-06-01','2027-12-31'],t6:['2027-08-15','2027-12-31']};
   let g = '';
   for(let i=0;i<=14;i++){const d=new Date(Date.UTC(2026,10+i,1));const s=d.toISOString().slice(0,10);const xx=x(s);
     g+=`<line x1="${xx}" y1="${top-6}" x2="${xx}" y2="${H-6}" stroke="var(--line)" stroke-width="1"/>`;

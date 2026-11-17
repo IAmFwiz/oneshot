@@ -1080,7 +1080,7 @@ handguns:[
  {id:'g43x',name:'Glock 43X CA',role:'Carry · if you want a Glock',status:['p-warn','Added Sept 29, 2026'],price:'Check',
   why:'The only new Glock a California dealer can sell since AB 1127. Rebuilt so it is not flagged as "convertible." Shipping was expected around December 2026.',
   watch:'Every other Glock on the roster is flagged and can\'t be sold new. Used Glocks still transfer through a private-party sale.'},
- {id:'echelon',name:'Springfield Echelon 4.0C (CA)',role:'Carry / home · your pick',status:['p-ok','On roster'],price:'$644–775',
+ {id:'echelon',name:'Springfield Echelon 4.0C (CA)',role:'Carry / home · your pick',status:['p-ok','On roster'],price:'$649.99 at WBT',
   why:'Compact, optic-first (its mounting system takes most red-dot footprints without a plate), excellent grip and trigger. Bigger than a P365 to carry, easier to shoot well. CA model EC9409BCA-U; compensated version EC9409BCA-U-COMP; the Gear Pac bundle adds mags, a green dot and a bag.',
   watch:'Comp and non-comp take different holsters. DOJ roster entries for 4.0C models show a 01/01/27 expiration; manufacturers normally renew, but have the dealer confirm the exact SKU is current on purchase day.'},
  {id:'hellcat',name:'Springfield Hellcat Pro (CA)',role:'Carry',status:['p-ok','On roster (verify)'],price:'Check',
@@ -1162,6 +1162,7 @@ function renderBuy(){
   <div class="callout hot"><span class="eyebrow">Recommendation</span><p><strong>Buy one carry pistol first and train with only that gun through Tier 3.</strong> The Sig P365 X-Macro is the default. Add a pump shotgun or featureless AR for the house only after your Tier 2 standards are met and the safe has room. Every gun must be listed on your CCW to carry it, and each one costs 30 more qualification rounds.</p></div>
   <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><span class="eyebrow">Want</span><span class="v">${nWant}</span><span class="s">on your list</span></div><div class="stat"><span class="eyebrow">Bought</span><span class="v">${nGot}</span><span class="s">owned</span></div><div class="stat"><span class="eyebrow">Limit</span><span class="v">3 / 30 days</span><span class="s">any firearms, CCW or not</span></div></div>
   <div class="callout"><span class="eyebrow">At the counter, every time</span><p>FSC card (exempt once you hold a CCW) · age 21 · proof of residence · safe-handling demo · DROS $37.19 + 11% state excise + sales tax · 10-day wait, pick up within 30 days · the sale is recorded on video. Check any handgun's exact model number on the <a href="https://oag.ca.gov/firearms/certified-handguns/search" target="_blank" rel="noopener">DOJ roster</a> before you go.</p></div>
+  ${kitHTML()}
   <h2 class="sec">Handguns</h2><div class="grid2">${B.handguns.map(buyCard).join('')}</div>
   <h2 class="sec">Skip these</h2>${list(B.avoid)}
   <h2 class="sec">Rifles</h2>
@@ -1175,131 +1176,212 @@ function renderBuy(){
   v.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{const [id,s]=b.dataset.buy.split('|');ST.buy=ST.buy||{};if(!s)delete ST.buy[id];else ST.buy[id]=s;commit(s?(s==='want'?'Added to your list':'Marked bought'):'Cleared');}));
 }
 
+function kitData(){ return [
+ ['Buy with the gun',[
+  ['k-gun','Echelon 4.0C Gear Pac (CA)','$749.99 · in stock at WBT','The base 4.0C is $649.99 (in stock); the Comp is out of stock. Retailers list the Gear Pac as 4 magazines, night sights, a green-dot optic and a range bag; that\'s about $100 for 2 extra mags (~$80) plus the dot and bag. Confirm the contents with WBT before choosing.','p-ok','Best value'],
+  ['k-mags','Springfield OEM 10-round 4.0C magazines (EC6010C)','$39.99 each · in stock','You need 5 for classes: buy 1 with the Gear Pac or 3 with the base gun. Stick with factory mags; skip the ProMag ones.','p-ok','Required'],
+  ['k-safe','DOJ-certified bedside quick-access safe + main safe','varies','Required by law since Jan 2026 for any gun not on you. Satisfies the safety-device requirement at pickup if you sign the affidavit.','p-no','Legally required'],
+  ['k-ammo','1,000 practice rounds (9mm FMJ) + 100 carry hollow points','~$400–550','Your first ammo purchase needs the $19 eligibility check. Carry ammo: Speer Gold Dot, Federal HST or Winchester Ranger T.','p-ok','Required'],
+  ['k-ppe','Eye and ear protection','$40–150','Electronic earmuffs let you hear range commands.','p-ok','Required']
+ ]],
+ ['Carry setup',[
+  ['k-holster','Rigid Kydex appendix (AIWB) holster with a claw, cut for your optic','$45–120','WBT stocks the We The People R238 for the 4.0C with an optic cut ($59.99, in stock). Also look at PHLster, Tenicor, T.Rex Arms and JM Custom Kydex, and confirm they list the Echelon 4.0C. Skip leather and belt-slide scabbards for daily carry.','p-ok','Required'],
+  ['k-belt','1.5" stiff gun belt','$60–120','The holster only works if the belt doesn\'t sag.','p-ok','Required'],
+  ['k-lockbox','DOJ-listed car lockbox','$50–120','For places you can\'t carry. Must be out of view or bolted down.','p-ok','Required']
+ ]],
+ ['Optic and sights',[
+  ['k-dot','Enclosed red dot: Holosun EPS Carry or 507K','$300–450','The Echelon mounts many dots directly, without an adapter plate. For a 407K or 507K, WBT sells the C&H Precision mount ($79.99, in stock); ask which your dot needs. If the Gear Pac includes a green dot, start with it and upgrade when you\'re ready.','p-acc','Strongly recommended'],
+  ['k-sights','Optic-height night sights (co-witness)','$45–160','Check whether the factory sights already show through your dot first. If not: Trijicon optic-height night sights ($129.99) or Night Fision optic-ready ($45) at WBT.','p-n','If needed']
+ ]],
+ ['Home defense and training',[
+  ['k-light','Compact pistol-mounted light','$150–300','For identifying a threat at night. Your holster must be made for gun + light.','p-acc','Recommended'],
+  ['k-dry','Dummy rounds and a MantisX trainer','$30–250','Bright orange inert rounds for dry fire and malfunction drills; MantisX diagnoses grip and trigger faults.','p-acc','Recommended'],
+  ['k-timer','Shot timer','$100–200','Every standard on the path is timed.','p-acc','Recommended'],
+  ['k-clean','Cleaning kit and lube','$30–60','The guide says clean the barrel after every use.','p-acc','Recommended'],
+  ['k-tq','Tourniquet (CAT Gen 7 or SOF-T Wide)','$30–40','Carry one with the gun.','p-acc','Recommended']
+ ]],
+ ['Skip for now',[
+  ['k-grip','Different-size grip module (Springfield S/M/L, standard or aggressive)','$64.99','Try the included backstraps first. Swapping modules is easy; the serialized part is the internal chassis.','p-n','Later'],
+  ['k-trigger','Aftermarket trigger, extended controls, aluminum grip modules','$31–440','Learn the stock gun first. Extended releases can snag in holsters; $330–440 aluminum modules are cosmetic.','p-n','Skip']
+ ]]
+]; }
+function kitHTML(){
+  const B=ST.buy||{};
+  return `<h2 class="sec">Your Echelon 4.0C kit</h2>
+  <div class="callout hot"><span class="eyebrow">Color</span><p><strong>Black only.</strong> Every Echelon on the DOJ roster is black, so a California dealer can't sell you a new desert/FDE one. Later you can have the slide Cerakoted or swap in a colored grip module.</p></div>
+  <div class="callout"><span class="eyebrow">Don't wait too long</span><p>The DOJ roster marks every Echelon with an asterisk: it was added under the court order in <em>Boland v. Bonta</em>. If that order is overturned on appeal, these listings could come off the roster and dealers couldn't sell them new. Guns already bought stay legal.</p></div>
+  ${kitData().map(([g,items])=>`<div class="ledger"><div class="lrow head" style="grid-template-columns:1fr"><span>${esc(g)}</span></div>${items.map(it=>{const st=B[it[0]]||'';return `<div class="lrow" style="grid-template-columns:minmax(0,1fr) auto;align-items:start"><span class="nm">${esc(it[1])} <span class="pill ${it[4]}" style="margin-left:4px">${esc(it[5])}</span><small>${esc(it[2])}</small><small style="margin-top:4px;color:var(--ink);font-weight:400">${esc(it[3])}</small></span>
+    <span class="seg" style="grid-template-columns:repeat(3,auto);min-width:0" role="group" aria-label="Status">${[['','—'],['want','Want'],['bought','Got it']].map(s=>`<button data-s="${s[0]==='bought'?'done':s[0]}" data-buy="${it[0]}|${s[0]}" aria-pressed="${st===s[0]}" style="padding:6px 8px">${s[1]}</button>`).join('')}</span></div>`}).join('')}</div>`).join('')}
+  <p class="foot">Prices and stock are from WBT Guns (wbtguns.com), Nov 17, 2026, or are marked as ranges. Call WBT at (619) 667-9453 to confirm before you drive out.</p>`;
+}
+
 /* ---------- FSC PREP ---------- */
 function fscData(){
 const T=['True','False'];
-const cats={safe:'Safety rules',ops:'How firearms work',handle:'Handling & malfunctions',store:'Storage & children',buy:'Buying & transfers',carry:'Transport & carry',prohib:'Prohibited persons'};
+const cats={rules:'Ch 1 · Safety rules',kids:'Ch 2 · Firearms and children',ops:'Ch 3 · Operation and handling',own:'Ch 4 · Ownership and storage',straw:'Ch 5 · Straw purchases',sales:'Ch 6 · Sales and transfers',law:'Ch 6 · Carry, use and prohibitions'};
+/* [id, cat, question, options, correctIndex, explanation, official?] — page numbers refer to the DOJ FSC Study Guide (2025) */
 const Q=[
-/* SAFETY RULES */
-['s01','safe','What is the first and most basic rule of firearm safety?',['Treat every firearm as if it is loaded','Always use the mechanical safety','Keep firearms clean and oiled','Store ammunition separately'],0,'Every other safety habit assumes this one. Most accidents involve a gun someone "knew" was unloaded.'],
-['s02','safe','If you have checked that a gun is unloaded, it is OK to point it at a person as long as your finger is off the trigger.',T,1,'Never point a firearm at anything you are not willing to destroy, loaded or not.'],
-['s03','safe','Where should your trigger finger be until your sights are on the target and you have decided to shoot?',['Outside the trigger guard, straight along the frame','Resting lightly on the trigger','Inside the trigger guard behind the trigger','On the safety lever'],0,'Finger off the trigger and outside the guard prevents most unintentional discharges.'],
-['s04','safe','A "safe direction" is one where:',['An unintentional discharge would not injure anyone or cause damage','The muzzle points at the ground, always','The muzzle points straight up','The muzzle points at a wall'],0,'No single direction is always safe. The ground can cause ricochets; a bullet fired upward comes down; walls may not stop a bullet.'],
-['s05','safe','A mechanical safety is a reliable substitute for safe gun handling.',T,1,'Safeties can fail or be left off. Safe handling is the real safety.'],
-['s06','safe','Before you fire, you must be sure of:',['Your target and what is beyond it','The wind direction only','The brand of ammunition','How many rounds are left'],0,'Bullets can pass through targets and walls and travel a long way.'],
-['s07','safe','Which ammunition should you use?',['Only the exact caliber or gauge marked on the barrel or slide','Any cartridge that fits in the chamber','Any cartridge of similar size','Whatever is cheapest'],0,'The wrong cartridge can destroy the firearm and injure you even if it chambers.'],
-['s08','safe','Alcohol, drugs and some prescription medications should never be combined with handling or shooting firearms.',T,0,'Impairment slows reactions and judgment. Check medication labels too.'],
-['s09','safe','Eye and ear protection should be worn:',['Every time you shoot, by shooters and spectators','Only at indoor ranges','Only with rifles','Only after 50 rounds'],0,'Gunfire causes permanent hearing loss and can throw debris and brass.'],
-['s10','safe','When someone hands you a firearm and says it is unloaded, you should:',['Open the action and check it yourself','Trust them if you know them','Check only the magazine','Dry fire it to confirm'],0,'Always check every firearm yourself, every time it changes hands.'],
-['s11','safe','Shooting at water or a hard, flat surface is safe because the bullet stops there.',T,1,'Bullets ricochet off water, rock and pavement.'],
-['s12','safe','Which statement about children and guns is true?',['Children may not be able to tell real guns from toys and may handle a gun they find','Children always know a real gun when they see one','Children will not touch a gun if told once','Only teenagers are at risk'],0,'Curiosity is the danger. Locking guns up is what actually prevents access.'],
-['s13','safe','If a child finds a gun, teach them to:',['Stop, don\'t touch it, leave the area and tell an adult','Pick it up carefully and bring it to an adult','Unload it','Hide it so no one gets hurt'],0,'The standard child safety message never involves touching the gun.'],
-['s14','safe','Hearing damage from gunfire is:',['Permanent and cumulative','Always temporary','Only a concern with rifles','Only a concern indoors'],0,'Each unprotected exposure adds up and does not heal.'],
-['s15','safe','Before crossing a fence or climbing with a firearm, you should unload it and open the action.',T,0,'A fall with a loaded gun is a classic cause of hunting accidents.'],
-/* HOW FIREARMS WORK */
-['o01','ops','The four components of a modern rifle or pistol cartridge are:',['Case, primer, powder and bullet','Hull, wad, shot and cap','Slug, sabot, case and flint','Barrel, chamber, case and bullet'],0,'Hull, wad and shot describe a shotgun shell.'],
-['o02','ops','Which part of a cartridge ignites the powder when struck?',['Primer','Bullet','Case mouth','Wad'],0,'The firing pin or striker hits the primer, which ignites the powder.'],
-['o03','ops','The "muzzle" is:',['The front end of the barrel where the projectile exits','The rear of the slide','The handle of the gun','The part that holds cartridges'],0,'Muzzle direction is what the safety rules are about.'],
-['o04','ops','The chamber is:',['The part of the barrel that holds the cartridge ready to fire','The magazine well','The trigger guard','The cylinder release'],0,'A round in the chamber means the gun can fire.'],
-['o05','ops','In a revolver, cartridges are held in a:',['Cylinder','Detachable magazine','Tube magazine','Clip'],0,'Each chamber in the cylinder rotates behind the barrel.'],
-['o06','ops','A double-action revolver can be fired by:',['A trigger pull alone, which cocks and releases the hammer','Only cocking the hammer by hand first','Only pressing the cylinder release','Pulling the trigger twice per shot'],0,'Most double-action revolvers can also be cocked manually first (single-action).'],
-['o07','ops','A single-action revolver requires:',['Cocking the hammer by hand before each shot','No hammer at all','Pulling the trigger twice','A magazine'],0,'The trigger only releases the hammer; it does not cock it.'],
-['o08','ops','Most semi-automatic pistols feed cartridges from:',['A detachable magazine in the grip','A rotating cylinder','A tube under the barrel','Loose rounds dropped in the chamber'],0,'That is why removing the magazine comes first when unloading.'],
-['o09','ops','A semi-automatic firearm fires one shot per trigger pull and automatically chambers the next round.',T,0,'Firing more than one shot per pull is fully automatic, which is illegal for civilians in California.'],
-['o10','ops','Which shotgun has the larger bore?',['12 gauge','20 gauge','28 gauge','They are identical'],0,'Smaller gauge number means larger bore.'],
-['o11','ops','In a rimfire cartridge, the priming compound is located:',['In the rim of the case','In a cup in the center of the case head','In the bullet','In the powder'],0,'Centerfire cartridges have a primer in the center of the case head.'],
-['o12','ops','Which are common rifle and shotgun action types?',['Bolt, lever, pump, semi-automatic and break (hinge)','Cylinder, slide and clip only','Flintlock only','Striker and hammer only'],0,'Know how to open each type to check that it is unloaded.'],
-['o13','ops','Rifling, the spiral grooves inside a barrel, makes the bullet:',['Spin for stability and accuracy','Travel faster than sound','Fragment on impact','Leave less residue'],0,'Most shotgun barrels are smoothbore, without rifling.'],
-['o14','ops','Firing a cartridge of the wrong caliber can damage the gun and injure the shooter even if it fits in the chamber.',T,0,'Check the barrel or slide markings against the headstamp on the cartridge.'],
-['o15','ops','In a shotgun shell, the wad:',['Separates the powder from the shot','Ignites the powder','Is the outer hull','Is the projectile'],0,'The wad seals the gas and holds the shot together.'],
-['o16','ops','On a semi-automatic pistol, the slide:',['Moves rearward when fired, ejecting the empty case and loading the next round','Holds the cartridges','Is the safety','Never moves'],0,'Locking the slide back is how you open the action to inspect the chamber.'],
-/* HANDLING */
-['h01','handle','With the muzzle in a safe direction and finger off the trigger, what is the FIRST step to unload a semi-automatic pistol?',['Remove the magazine','Pull the slide back','Pull the trigger','Engage the safety and stop'],0,'If you rack the slide first, the magazine loads a new round into the chamber.'],
-['h02','handle','After removing the magazine from a semi-automatic pistol, you must:',['Lock the slide back and visually and physically check that the chamber is empty','Consider it unloaded','Pull the trigger to clear it','Reinsert the magazine'],0,'Look and feel. A round can remain in the chamber.'],
-['h03','handle','A semi-automatic pistol with its magazine removed is always unloaded.',T,1,'A cartridge can still be in the chamber, and some pistols fire with the magazine out.'],
-['h04','handle','To check that a revolver is unloaded:',['Open the cylinder and look at every chamber','Look at the front of the cylinder','Pull the trigger','Cock the hammer'],0,'Swing out or open the cylinder and inspect each chamber.'],
-['h05','handle','You pull the trigger and the gun does not fire. What should you do?',['Keep it pointed in a safe direction and wait before opening the action, in case of a delayed firing','Look down the barrel','Open the action immediately','Hand it to someone else'],0,'A hangfire can fire late. Common guidance is to wait at least 30 seconds.'],
-['h06','handle','A "hangfire" is:',['A delay between the primer being struck and the cartridge firing','A bullet stuck in the barrel','A cartridge that fires twice','A worn firing pin'],0,'That is why you wait with the muzzle in a safe direction after a misfire.'],
-['h07','handle','A "squib load" is:',['A cartridge that fires with too little power and may leave the bullet stuck in the barrel','A high-power cartridge','A blank round','A shotgun shell'],0,'Firing another round behind a stuck bullet can burst the barrel.'],
-['h08','handle','A shot sounds or feels unusually weak. You should:',['Stop, unload and check the barrel for an obstruction','Fire again to push it out','Speed up','Clean the slide'],0,'Never fire again until the bore is confirmed clear.'],
-['h09','handle','Before cleaning, a firearm must be unloaded and all ammunition removed from the cleaning area.',T,0,'Many accidental discharges happen during cleaning.'],
-['h10','handle','You reduce lead exposure at the range by:',['Washing hands and face afterward and not eating, drinking or smoking while shooting','Wearing ear protection','Shooting faster','Using a revolver'],0,'Lead from primers and bullets settles on skin and clothes.'],
-['h11','handle','When handing a firearm to another person, it should be:',['Unloaded with the action open','Loaded with the safety on','Holstered','Muzzle-first'],0,'An open action lets both people see that it is empty.'],
-['h12','handle','A barrel obstruction such as mud, snow or a stuck bullet can:',['Cause the barrel to burst when fired','Improve accuracy','Only affect cleaning','Nothing serious'],0,'Check the bore whenever an obstruction is possible.'],
-['h13','handle','A dropped loaded firearm can fire.',T,0,'Do not try to catch a falling gun.'],
-['h14','handle','If you are unfamiliar with a firearm, you should:',['Read the owner\'s manual or get instruction before handling or loading it','Learn by test-firing it','Ask the seller to load it','Dry fire it with ammunition nearby'],0,'Know how the gun works before you use it.'],
-['h15','handle','Dry fire practice should only be done:',['After confirming the gun is unloaded, with no ammunition in the room, pointed at a safe backstop','Anywhere if the safety is on','With a round in the magazine','Pointed at a mirror or window'],0,'Remove ammunition from the room so a loaded gun can\'t sneak into practice.'],
-/* STORAGE */
-['st01','store','For California\'s criminal storage laws, a "child" is anyone under the age of:',['18','16','14','21'],0,'Penal Code 25100.'],
-['st02','store','In California you can be charged with a crime if a child gets your negligently stored loaded firearm and injures someone.',T,0,'Criminal storage can be charged even without injury in some cases; injury or death makes it more serious.'],
-['st03','store','Every firearm sold by a California dealer must include:',['A DOJ-certified firearm safety device, unless you show proof of owning a DOJ-certified safe or lock box','A free box of ammunition','A cleaning kit','A holster'],0,'Penal Code 23635.'],
-['st04','store','If you live with someone who is prohibited from having firearms, you must:',['Keep your firearms in a locked container or DOJ-approved safe, or disabled with a locking device','Give them a key so they can find it','Do nothing special','Only keep long guns'],0,'Penal Code 25135.'],
-['st05','store','The safest way to store firearms at home is:',['Unloaded, locked in a safe or with a locking device, with ammunition stored separately and locked','Loaded in a nightstand drawer','Hidden on a high shelf','In a closet under clothes'],0,'Locking is what stops access by children, visitors and thieves.'],
-['st06','store','Hiding a gun in a closet or drawer is adequate storage if your children don\'t know it is there.',T,1,'Children find hidden guns. Lock them.'],
-['st07','store','A loaded gun on a high shelf should still be considered accessible to children.',T,0,'Children climb.'],
-['st08','store','A gun safe or lock primarily prevents:',['Unauthorized access by children and others, and theft','Rust','Accidental discharge during cleaning','Lead exposure'],0,'Storage is about who can get to the gun.'],
-['st09','store','Since Jan 1, 2026 (Penal Code 25145), a firearm in a home must be:',['Locked in a certified container or disabled with a certified lock unless it is carried or within your close control','Stored loaded for emergencies','Registered with the city','Kept in the garage'],0,'New law: the printed DOJ guide may not mention it yet, but it is the law now.'],
-['st10','store','Teaching children about gun safety removes the need to lock up firearms.',T,1,'Education helps; locked storage is still required.'],
-['st11','store','When guests with children visit, you should:',['Make sure every firearm is locked and inaccessible','Show the children where the guns are','Unload the guns but leave them out','Nothing, if the guns are unloaded'],0,'Visitors are part of the risk.'],
-['st12','store','Ammunition should be stored:',['In a cool, dry, locked place, separate from firearms','Next to the stove','Loose in a vehicle','In the gun at all times'],0,'Separate, locked storage adds another barrier.'],
-['st13','store','If a household member may be at risk of suicide, a responsible step is to:',['Store firearms away from the home temporarily or seek a Gun Violence Restraining Order','Hide the key','Unload them only','Do nothing unless asked'],0,'Removing access during a crisis saves lives.'],
-/* BUYING */
-['b01','buy','To buy or receive almost any firearm in California, you need:',['A valid Firearm Safety Certificate (FSC)','A hunting license','A CCW license','A gun club membership'],0,'Some groups are exempt, including CCW holders and peace officers.'],
-['b02','buy','An FSC is valid for:',['5 years','1 year','10 years','Life'],0,'Renew by retaking the test.'],
-['b03','buy','To pass the 30-question FSC test, you must answer at least how many correctly?',['23','20','25','27'],0,'75% is 23 of 30.'],
-['b04','buy','The minimum age to buy a handgun from a California dealer is:',['21','18','19','25'],0,'California also restricts most long gun sales to those under 21, with exceptions.'],
-['b05','buy','California\'s waiting period between purchase and delivery is:',['10 days','3 days','5 days','30 days'],0,'The background check runs during the wait.'],
-['b06','buy','A private sale between two Californians who are not exempt family must be done:',['Through a licensed California firearms dealer','In a parking lot with a bill of sale','By mail','Any way they agree'],0,'The dealer runs the background check and the 10-day wait.'],
-['b07','buy','A transfer between a parent and child, or grandparent and grandchild:',['Can be made without a dealer, but must be reported to DOJ','Is never allowed','Must always go through a dealer','Needs no paperwork'],0,'The intrafamily exemption still requires a report to DOJ.'],
-['b08','buy','When you take delivery of a handgun from a dealer, you must:',['Perform a safe handling demonstration','Fire it at the store','Show a hunting license','Sign a waiver'],0,'Penal Code 26850.'],
-['b09','buy','You may buy a gun for a friend who cannot pass the background check if no money changes hands.',T,1,'That is a "straw purchase", a serious crime.'],
-['b10','buy','A dealer can sell a new handgun only if:',['It is on the DOJ Roster of Certified Handguns','It is under $1,000','It is a revolver','The buyer has a CCW'],0,'Off-roster handguns can only be transferred used, through a dealer, in limited cases.'],
-['b11','buy','When you buy a firearm, the dealer submits your information to DOJ on a:',['Dealer Record of Sale (DROS)','Form 4473 only','Bill of sale','Hunting tag'],0,'The DROS starts the background check and the 10-day wait.'],
-['b12','buy','You must take delivery within how many days of the DROS, or the sale must be redone?',['30','10','60','90'],0,'Set by DOJ rules: after 30 days the DROS must be redone.'],
-['b13','buy','Giving false information on a firearm purchase form is:',['A crime','A minor paperwork issue','Allowed if corrected later','Only a federal concern'],0,'False statements on DROS or federal forms are prosecuted.'],
-['b14','buy','In California, ammunition is bought:',['From a licensed vendor, in person, with an eligibility check','Online shipped to your door','From anyone at a gun show without checks','Only at ranges'],0,'Online orders ship to a vendor, who completes the check.'],
-['b15','buy','New residents bringing firearms into California must report them to DOJ within:',['60 days','10 days','30 days','1 year'],0,'Penal Code 27560. Starting in 2028, new residents will also need an FSC within 180 days.'],
-['b16','buy','You may buy ammunition in another state and bring it into California yourself.',T,1,'Penal Code 30314 bars residents from bringing in out-of-state ammunition themselves.'],
-['b17','buy','A lost or stolen firearm must be reported to local law enforcement within:',['5 days of when you knew or should have known','30 days','48 hours of purchase','1 year'],0,'Penal Code 25250.'],
-['b18','buy','Buying a handgun requires proof of identity and proof of:',['California residency','A hunting license','Gun club membership','A CCW'],0,'Bring a utility bill, lease or similar along with your ID.'],
-['b19','buy','Selling ammunition to a person under 18 is:',['Illegal','Legal with a note from a parent','Legal for rifle ammo','Legal at ranges'],0,'Handgun ammunition generally cannot be sold to anyone under 21.'],
-/* TRANSPORT & CARRY */
-['c01','carry','Without a carry license, a handgun in a vehicle must be:',['Unloaded and in a locked container or the trunk','Loaded in the glove compartment','Unloaded on the seat','In a holster on your belt'],0,'Penal Code 25610.'],
-['c02','carry','A locked glove compartment counts as a "locked container" for transporting a handgun.',T,1,'The law specifically excludes the glove compartment and utility compartment.'],
-['c03','carry','Under California law, a firearm is considered "loaded" when:',['A cartridge is in the chamber or in a magazine attached to the gun','Only when a round is in the chamber','Only when the hammer is cocked','Only when ammunition is in the same car'],0,'Penal Code 16840: an attached loaded magazine makes the gun loaded.'],
-['c04','carry','Carrying a concealed handgun in public without a CCW license is:',['Illegal','Legal if unloaded','Legal in your own city','Legal at night'],0,'Penal Code 25400.'],
-['c05','carry','Openly carrying an unloaded handgun in public in an incorporated city is:',['Generally illegal','Legal if it is visible','Legal on weekends','Legal near schools'],0,'Penal Code 26350.'],
-['c06','carry','A gun-free school zone extends how far from the grounds of a K-12 school?',['1,000 feet','500 feet','100 yards','1 mile'],0,'Penal Code 626.9.'],
-['c07','carry','Within a school zone, an unlicensed person may transport a handgun only if it is:',['Unloaded and in a locked container or a vehicle\'s locked trunk','Loaded in a holster','Unloaded on the dashboard','In a backpack'],0,'Penal Code 626.9 exceptions.'],
-['c08','carry','Drawing or showing a firearm in a rude, angry or threatening manner (other than in lawful self-defense) is:',['A crime called brandishing','Legal if unloaded','Legal on private property','Only a traffic violation'],0,'Penal Code 417.'],
-['c09','carry','It is legal to carry a loaded handgun on your car\'s passenger seat without a license if it is in a holster.',T,1,'Without a license it must be unloaded and locked or in the trunk.'],
-['c10','carry','Without a license, carry a handgun between your car and your home or a range:',['Unloaded, in a locked container','Loaded in your waistband','Unloaded in your hand','Loaded in a bag'],0,'Same rule as in the vehicle.'],
-['c11','carry','To fly with a firearm, it must be:',['Unloaded, in a locked hard-sided case, in checked baggage and declared to the airline','In your carry-on','Unloaded in your pocket','Shipped separately only'],0,'TSA and airline rules.'],
-['c12','carry','Firing a gun in a grossly negligent way that could injure someone is a crime even if no one is hurt.',T,0,'Penal Code 246.3.'],
-['c13','carry','Shooting at an inhabited home or occupied vehicle is:',['A felony','A misdemeanor','An infraction','Legal on your property'],0,'Penal Code 246.'],
-['c14','carry','Deadly force in self-defense is justified only when you reasonably believe:',['You or another person face imminent death or great bodily injury','Someone insulted you','Property is being stolen','Someone is trespassing'],0,'The threat must be imminent and the response reasonable.'],
-/* PROHIBITED PERSONS */
-['p01','prohib','A person convicted of a felony is prohibited from owning firearms:',['For life','For 10 years','For 5 years','Until probation ends'],0,'Penal Code 29800.'],
-['p02','prohib','Certain misdemeanor convictions, such as domestic violence or brandishing, prohibit firearm possession in California for:',['10 years','1 year','5 years','Life'],0,'Penal Code 29805. Federal law separately bans people with a domestic violence misdemeanor conviction for life.'],
-['p03','prohib','A person taken into custody as a danger to self or others (a "5150" hold) and admitted is prohibited for:',['5 years','6 months','1 year','10 years'],0,'Welfare and Institutions Code 8103.'],
-['p04','prohib','A person subject to a domestic violence restraining order:',['May not own or possess firearms while it is in effect, and must relinquish them','May keep guns at home','May keep long guns','Is affected only after a conviction'],0,'Family Code 6389.'],
-['p05','prohib','Who can petition for a Gun Violence Restraining Order (GVRO)?',['Law enforcement, family or household members, employers, coworkers and school staff','Only police','Only a judge','Anyone in the state'],0,'California expanded the list of petitioners in 2020.'],
-['p06','prohib','A GVRO:',['Temporarily prohibits a person from having firearms and ammunition','Is a criminal conviction','Permanently bans firearms','Only applies to handguns'],0,'It is a civil order issued by a court.'],
-['p07','prohib','A person addicted to narcotics is prohibited from possessing firearms.',T,0,'Penal Code 29800.'],
-['p08','prohib','Furnishing a handgun to a minor (under 18) is:',['Illegal, except for limited supervised lawful activities','Legal with parental consent','Legal for target shooting anywhere','Legal on private land'],0,'Penal Code 27505 and 29610.'],
-['p09','prohib','Criminal storage penalties increase if a child uses your gun to injure or kill someone.',T,0,'It can be charged as a felony.'],
-['p10','prohib','If you become a prohibited person, you must:',['Relinquish your firearms as the law and court require','Keep them locked at home','Transfer them to a roommate','Only stop buying new ones'],0,'Courts set deadlines and require proof of relinquishment.']
+/* ---- CH 1: SAFETY RULES ---- */
+['r01','rules','A safe practice when handling a firearm is to rest your finger on the outside of the trigger guard or along the side of the firearm until you are ready to shoot.',T,0,'Rule 3: finger off the trigger until ready to shoot. (p. 4)',1],
+['r02','rules','To "know your target, its surroundings, and beyond," you must consider that if the bullet misses or completely passes through the target, it could strike a person or object.',T,0,'Rule 4. (p. 4)',1],
+['r03','rules','Drinking alcohol while handling firearms is safe if your blood alcohol level remains below the legal limit.',T,1,'Firearms, alcohol and drugs don\'t mix, at any level. (p. 5)',1],
+['r04','rules','Which of the following safety points should you remember when handling a firearm?',['Never shoot a firearm in the air in celebration','Do not fire at water, flat, or hard surfaces','Wear ear and eye protection when shooting a firearm','All of the above'],3,'All three are "Additional Safety Points." (p. 5)',1],
+['r05','rules','As a safety measure, your firearm should always be pointed:',['To the north','In the safest possible direction','Up','Down'],1,'Rule 2. Neither up nor down is always safe. (p. 4)',1],
+['r06','rules','One of the safety rules is to know how to properly:',['Clear a malfunction','Operate your firearm','Load your firearm','Clean your firearm'],1,'Rule 5: know how to properly operate your firearm. (p. 5)',1],
+['r07','rules','How many "basic firearm safety rules" does the DOJ study guide list?',['Six','Four','Five','Ten'],0,'Loaded, safe direction, finger off trigger, know your target, know your firearm, store safely with ammo separate. (p. 4)'],
+['r08','rules','Which is the first of the basic firearm safety rules?',['Treat all firearms as if they are loaded','Store firearms in a safe','Wear eye protection','Use the safety'],0,'(p. 4)'],
+['r09','rules','Which is one of the six basic safety rules?',['Store your firearm safely and securely to prevent unauthorized use; store firearms and ammunition separately','Always keep a round chambered for readiness','Clean your firearm after every 500 rounds','Carry your firearm everywhere'],0,'Rule 6. (p. 4)'],
+['r10','rules','A "safe direction" is one where:',['An accidental discharge will not cause injury or damage','The muzzle points at the floor','The muzzle points at the ceiling','Nobody is standing directly in front'],0,'(p. 4)'],
+['r11','rules','If you are unable to check whether a firearm is unloaded, you should:',['Leave it alone and seek help from someone more knowledgeable','Pull the trigger while pointing it safely','Assume it is unloaded','Remove the magazine and carry it'],0,'(p. 4)'],
+['r12','rules','You should never fire at a target that is only a movement, color, sound or unidentifiable shape.',T,0,'Identify your target. If in doubt, don\'t shoot. (p. 5)'],
+['r13','rules','Why can sudden loud noises lead to an accidental discharge?',['People tend to tighten their muscles when startled, which can squeeze the trigger','Noise vibrates the firing pin','Noise releases the safety','It cannot happen'],0,'"The trigger is for firing; the handle is for handling." (p. 4)'],
+['r14','rules','You should never handle a firearm when you are in an emotional state, such as angry or depressed.',T,0,'Your judgment may be impaired. (p. 5)'],
+['r15','rules','A bullet fired into the air in celebration:',['Can return to the ground with enough speed to injure or kill','Is harmless because it slows down','Is legal on holidays','Burns up before landing'],0,'Celebratory fire is unsafe and generally illegal. (p. 5)'],
+['r16','rules','You should take a firearm from someone only after you verify that it is unloaded and the cylinder or action is open.',T,0,'Applies both when handing and receiving. (p. 5)'],
+['r17','rules','You should avoid handling firearms while taking medication that warns against operating machinery.',T,0,'(p. 5)'],
+['r18','rules','Questions about how your particular firearm operates are best directed to:',['Your firearms dealer or the manufacturer','A friend with a different model','Online forums only','Nobody; all firearms work the same'],0,'Never assume one model works like another. (p. 5)'],
+/* ---- CH 2: CHILDREN ---- */
+['k01','kids','Toddlers lack the strength to pull the trigger of a firearm.',T,1,'A child\'s thumb has twice the strength of the other fingers. (p. 7)',1],
+['k02','kids','You may face misdemeanor or felony charges if you keep a firearm where a child obtains and improperly uses it.',T,0,'(p. 7)',1],
+['k03','kids','There is no such thing as being too careful with children and firearms.',T,0,'(p. 7)',1],
+['k04','kids','An important lesson children should learn is that firearms are not toys.',T,0,'(p. 7)',1],
+['k05','kids','The four safety "Rules for Kids" if they see a firearm are:',['Stop, Don\'t Touch, Leave the Area, Tell an Adult','Stop, Pick It Up, Unload It, Tell an Adult','Run, Hide, Call 911, Wait','Don\'t Touch, Hide It, Tell a Friend, Leave'],0,'(p. 8)',1],
+['k06','kids','Child safety precautions only apply if you have children.',T,1,'Nieces, nephews, grandchildren and neighbors\' kids visit. (p. 7)',1],
+['k07','kids','Under California\'s child-access storage laws, a "child" is any person under:',['18','16','14','21'],0,'(pp. 7, 38)'],
+['k08','kids','When a toddler\'s thumb pushes against a trigger, the barrel is usually pointing:',['At the child\'s face','At the floor','Away from the child','At the ceiling'],0,'(p. 7)'],
+['k09','kids','A child who finds a firearm should pick it up and take it to an adult.',T,1,'A child should NEVER touch a firearm they find. (p. 8)'],
+['k10','kids','The third Rule for Kids, "Leave the Area," includes never trying to take a firearm away from another child.',T,0,'(p. 8)'],
+['k11','kids','In a home where children are likely to be present, firearms should be stored:',['Unloaded and securely stored, with ammunition in a separate location','Loaded but hidden','Unloaded on a high shelf','In a bedside drawer'],0,'(p. 7)'],
+['k12','kids','Children learn most about firearm safety by:',['Observing the safe conduct of adults around them','Being warned once','Watching movies','Handling toy guns'],0,'Actions speak louder than words. (p. 7)'],
+['k13','kids','Answering a child\'s questions about firearms honestly and openly can reduce their natural curiosity.',T,0,'(p. 7)'],
+/* ---- CH 3: OPERATION & HANDLING ---- */
+['o01','ops','The importance of the "dangerous range" is that a bullet can travel far beyond the intended target.',T,0,'(p. 24)',1],
+['o02','ops','The safety on a semiautomatic pistol is not foolproof.',T,0,'(p. 15)',1],
+['o03','ops','Just because a cartridge fits into your firearm does not necessarily mean it is safe to shoot.',T,0,'(p. 24)',1],
+['o04','ops','In the case of a malfunction, you should:',['Keep your finger on the trigger','Immediately drop the firearm','Try and determine where the malfunction is','Keep the firearm pointed in a safe direction'],3,'(p. 24)',1],
+['o05','ops','After ensuring a double-action revolver is pointed in a safe direction with your finger off the trigger, you begin unloading it by:',['Opening the cylinder','Locking the slide back','Opening the loading gate','Pushing the magazine release'],0,'Loading gates are on single-action revolvers; slides and magazines on pistols. (p. 12)',1],
+['o06','ops','Firearm or ammunition caliber refers to:',['Barrel length','Magazine capacity','Barrel or bullet diameter','Bullet velocity'],2,'(p. 23)',1],
+['o07','ops','A magazine is part of a:',['Single-action revolver','Double-action revolver','Semiautomatic pistol','Single-action and a double-action revolver'],2,'(p. 15)',1],
+['o08','ops','After a malfunction, how long does the guide say to wait before attempting to clear it?',['30 seconds','5 seconds','2 minutes','No wait is needed'],0,'Stop firing, keep it pointed safely, wait 30 seconds, seek competent help. (p. 24)'],
+['o09','ops','At a range, the usual procedure when your firearm malfunctions is to:',['Keep it pointed downrange, finger off the trigger, and raise your non-shooting hand for a range official','Turn around to ask for help','Set it on the bench and walk away','Shake it to clear the jam'],0,'(p. 24)'],
+['o10','ops','Most ammunition can travel at least:',['A mile, some more than two miles','100 yards','500 feet','A quarter mile'],0,'(p. 24)'],
+['o11','ops','Most ammunition can penetrate the interior walls of a house and keep traveling.',T,0,'Magnum ammunition penetrates even more. (p. 24)'],
+['o12','ops','Once you fire, you are responsible for any damage or injury your bullet causes.',T,0,'(p. 24)'],
+['o13','ops','The four components of a cartridge are:',['Case, primer, propellant (powder) and bullet','Shell, wad, shot and cap','Bullet, barrel, chamber and case','Primer, hammer, case and bullet'],0,'(p. 23)'],
+['o14','ops','The primer is:',['The impact-sensitive chemical compound used for ignition','The projectile','The metal cylinder holding the components','The fast-burning powder'],0,'(p. 23)'],
+['o15','ops','People often call the whole cartridge a "bullet," but the bullet is only:',['The projectile at the tip of the cartridge','The case','The primer','The powder'],0,'(p. 23)'],
+['o16','ops','The push of expanding gases against the firearm is called:',['Recoil','Ricochet','Muzzle velocity','Flinch'],0,'Anticipating recoil can cause flinching. (p. 23)'],
+['o17','ops','On a semiautomatic pistol, caliber information is generally found:',['On the slide','On the magazine','On the grip','On the trigger guard'],0,'Revolvers generally show it on the barrel; ammunition on the box. (p. 23)'],
+['o18','ops','What is the FIRST step in unloading a semiautomatic pistol (after pointing it in a safe direction)?',['Remove the magazine','Lock the slide back','Pull the trigger','Check the chamber'],0,'Remove the magazine first, then lock the slide back and check the chamber. (p. 18)'],
+['o19','ops','A semiautomatic pistol is unloaded once the magazine is removed.',T,1,'A cartridge may still be in the chamber. (p. 18)'],
+['o20','ops','Simply spinning a revolver\'s cylinder to an empty chamber unloads it.',T,1,'You must remove every cartridge. (p. 12)'],
+['o21','ops','In a double-action firearm, a single pull of the trigger:',['Both cocks the hammer and releases it','Only releases a pre-cocked hammer','Fires two shots','Opens the cylinder'],0,'Glossary. (p. 41)'],
+['o22','ops','In a single-action firearm, pulling the trigger:',['Releases the hammer, which must already be cocked','Cocks and releases the hammer','Ejects the cartridge','Releases the magazine'],0,'Glossary. (p. 41)'],
+['o23','ops','The chamber is:',['The rear part of the barrel where the cartridge sits when loaded','The front of the barrel','The magazine well','The cylinder latch'],0,'Glossary. (p. 41)'],
+['o24','ops','The muzzle is:',['The front end of the barrel from which the bullet exits','The handle','The rear of the barrel','The trigger guard'],0,'Glossary. (p. 41)'],
+['o25','ops','A dummy round is:',['A brightly colored inert cartridge without powder or primer','A cartridge that failed to fire','A blank','A practice bullet with reduced powder'],0,'Used in safe handling demonstrations. (p. 41)'],
+['o26','ops','You should never shoot ammunition that is old, dirty, corroded, wet or can\'t be fully identified.',T,0,'It can cause a jam, misfire or explosion. (p. 24)'],
+['o27','ops','Unwanted ammunition should be:',['Disposed of following your local refuse department\'s instructions','Thrown in the trash','Burned','Buried'],0,'Never throw ammunition in the trash. (p. 24)'],
+['o28','ops','The trigger guard is:',['A rigid loop around the trigger that protects it from damage or accidental discharge','A safety lever','The magazine release','The rear sight'],0,'Glossary. (p. 41)'],
+['o29','ops','During a safe handling demonstration, "muzzle awareness" means:',['Keeping the firearm pointed in a safe direction, preferably down at the ground','Looking into the muzzle to check for rounds','Covering the muzzle with your hand','Pointing it at the instructor'],0,'(p. 19)'],
+['o30','ops','Which does the guide list as common calibers?',['.22, .45 and 9 mm','12, 20 and 410','.308 only','30-06 and .50'],0,'(p. 23)'],
+/* ---- CH 4: OWNERSHIP & STORAGE ---- */
+['w01','own','It is important to carefully read all instructional material you receive with your firearm.',T,0,'(p. 26)',1],
+['w02','own','Certain modifications, when made to a firearm, may void its warranty.',T,0,'Some modifications are also illegal and dangerous. (pp. 26–27)',1],
+['w03','own','It is safe to store a loaded firearm in your bedside table.',T,1,'The guide says never store a firearm in a bedside table, under a mattress or pillow, or on a closet shelf. (p. 28)',1],
+['w04','own','Two common firearms safety devices are trigger locks and cable locks.',T,0,'(p. 27)',1],
+['w05','own','Which of the following steps should be taken to "childproof" your firearm?',['Use a firearms safety device AND store the firearm in a locked container','Always store your firearm unloaded','Store ammunition separately in a locked container','All of the above'],3,'(p. 28)',1],
+['w06','own','For maximum safety, store your unloaded firearm using:',['Both a firearm safety device and a locking storage container','Only a trigger lock','Only a hiding place','A holster'],0,'(p. 27)'],
+['w07','own','Trigger locks and cable locks are designed to prevent access to the firearm itself.',T,1,'They keep it from being fired, not from being handled or stolen. (p. 28)'],
+['w08','own','Firearm safes usually weigh at least:',['50 pounds','10 pounds','25 pounds','200 pounds'],0,'(p. 28)'],
+['w09','own','Storage devices are only as secure as:',['The precautions you take to protect the key or combination','The brand name','The color','Their price'],0,'(p. 28)'],
+['w10','own','Every firearm sold in California must come with a DOJ-approved firearm safety device, or:',['Proof the buyer owns a firearm safe that meets DOJ standards','A cleaning kit','A holster','Nothing else is accepted'],0,'(p. 27)'],
+['w11','own','Starting January 1, 2026, a firearm in a residence must be securely stored with a DOJ-approved device or safe whenever it is not:',['Carried by, or within close proximity of, a lawful authorized user','In a holster','Unloaded','In the garage'],0,'Penal Code 25145. (p. 27)'],
+['w12','own','The barrel should be cleaned:',['After every use','Once a year','Only when it looks dirty','Never'],0,'(p. 26)'],
+['w13','own','Before cleaning a firearm, you should:',['Make sure it is unloaded and remove all ammunition from the cleaning area','Remove only the magazine','Point it at the floor and pull the trigger','Oil it while loaded'],0,'(p. 26)'],
+['w14','own','To avoid ingesting lead, you should:',['Wash your hands before handling food or drink and not smoke when exposed to lead','Wear gloves only while shooting','Clean in a closed room','Use more solvent'],0,'Ventilate the cleaning area too. (p. 26)'],
+['w15','own','Repairs to a firearm should be made only by:',['A gunsmith or the manufacturer','Any owner with tools','A friend who shoots','The dealer\'s cashier'],0,'(p. 26)'],
+['w16','own','Storing your firearm among valuables like jewelry is a good idea unless it is locked in a secure container.',T,1,'Thieves search those places. Don\'t store it with valuables unless it\'s locked in a secure container. (p. 28)'],
+['w17','own','The best way to become skilled with your firearm is to:',['Enroll in a hands-on training course','Read online reviews','Watch videos only','Practice with a friend'],0,'(p. 26)'],
+['w18','own','Firearms not kept for self-defense can be stored securely away from the home.',T,0,'(p. 28)'],
+/* ---- CH 5: STRAW PURCHASES ---- */
+['x01','straw','A straw purchase is:',['Buying a firearm for someone who is prohibited, or who doesn\'t want their name on the sale','Buying a used firearm','Buying a rifle with a wooden stock','Buying ammunition online'],0,'(p. 30)'],
+['x02','straw','An illegal firearm purchase (straw purchase) is a federal crime.',T,0,'(p. 30)'],
+['x03','straw','Under federal law, a straw purchase can bring a sentence of up to:',['15 years and a fine of up to $250,000','1 year and $1,000','5 years and $10,000','No penalty if no money changes hands'],0,'(p. 30)'],
+['x04','straw','Buying a firearm and giving it to someone prohibited from owning one is:',['A state and federal crime','Only a federal crime','Legal if they are family','Legal if done as a gift'],0,'(p. 30)'],
+['x05','straw','Transferring a firearm between two private parties without going through a licensed dealer may be punishable as a felony.',T,0,'Penal Code 27545 and 27590. (p. 30)'],
+/* ---- CH 6: SALES & TRANSFERS ---- */
+['b01','sales','To legally give a firearm to your best friend as a birthday gift, you must complete the transfer through a licensed firearms dealer.',T,0,'Friends are not immediate family. (p. 31)',1],
+['b02','sales','Generally, it is illegal to sell, supply, deliver, or give possession of any firearm to a person under 21 years of age.',T,0,'Penal Code 27510. (p. 38)',1],
+['b03','sales','The mandatory waiting period before a dealer can deliver a firearm is:',['10 days','3 days','15 days','30 days'],0,'DOJ runs the background check during the wait. (p. 31)'],
+['b04','sales','To pass the FSC test you must score at least:',['75%','60%','80%','90%'],0,'That is 23 of 30. (pp. 1, 32)'],
+['b05','sales','An FSC is valid for:',['5 years','1 year','3 years','Life'],0,'(p. 32)'],
+['b06','sales','The fee for taking the FSC test and being issued an FSC is:',['$25','$5','$15','$50'],0,'(p. 32)'],
+['b07','sales','A replacement for a lost, stolen or destroyed FSC costs:',['$5','$25','$10','It is free'],0,'Issued by the DOJ Certified Instructor who issued the original. (p. 32)'],
+['b08','sales','For "intra-familial" transfers that may skip a dealer, immediate family means:',['Parent and child, and grandparent and grandchild','Any relative','Brothers and sisters','Spouses and cousins'],0,'Transfers between siblings must go through a dealer. (p. 31)'],
+['b09','sales','After an intra-familial transfer, the recipient must report it to DOJ within:',['30 days','10 days','60 days','1 year'],0,'Using form BOF 4544A or CFARS. The recipient also needs an FSC first. (p. 31)'],
+['b10','sales','For a private-party transfer, a dealer may charge (in addition to state fees) no more than:',['$10 per firearm','$25 per firearm','$50 per firearm','$100 per firearm'],0,'(p. 31)'],
+['b11','sales','During a private-party transfer, who holds the firearm during the 10-day waiting period?',['The dealer','The seller','The buyer','The police'],0,'(p. 31)'],
+['b12','sales','Which document can serve as proof of California residency to buy a handgun?',['A utility bill from the last three months','A gym membership card','A library card','A paycheck stub from last year'],0,'A signed lease, property deed or California military orders also work. (p. 31)'],
+['b13','sales','The address on the DROS must match the address on either your proof-of-residency document or your California driver license or ID.',T,0,'Penal Code 26845. (p. 32)'],
+['b14','sales','Proof of residency is required to buy a long gun (rifle or shotgun).',T,1,'Under state law it applies to handguns; federal rules may apply. (p. 33 table)'],
+['b15','sales','The safe handling demonstration must be performed:',['In front of a DOJ Certified Instructor, between DROS submission and delivery','Before you take the FSC test','At home after delivery','Only for long guns'],0,'Buyer, dealer and instructor sign an affidavit. (p. 32)'],
+['b16','sales','Which transactions are NOT subject to the safe handling demonstration?',['Pawn returns and intra-familial transfers','Retail sales','Private-party transfers','All handgun sales'],0,'(p. 32)'],
+['b17','sales','A dealer may sell a new handgun to the public only if it is listed on DOJ\'s Roster of Handguns Certified for Sale.',T,0,'Private-party, intra-familial and pawn returns are exempt from the roster. (p. 32)'],
+['b18','sales','New residents moving to California with firearms must, within 60 days, either report them to DOJ or sell or transfer them.',T,0,'The New Resident Firearm Ownership Report costs $19. (p. 33)'],
+['b19','sales','The fee for a New Resident Firearm Ownership Report is:',['$19','$5','$25','$37.19'],0,'(p. 33)'],
+['b20','sales','Reclaiming a pawned firearm requires a DROS and the 10-day wait.',T,0,'(p. 32)'],
+['b21','sales','Pawn returns are exempt from the FSC requirement.',T,0,'(p. 32)'],
+['b22','sales','A person who makes their own firearm must:',['Apply to DOJ for a unique serial number for it','Do nothing if it is for personal use','Register it with the city','Engrave their name on it'],0,'(p. 33)'],
+['b23','sales','Without a manufacturer\'s license, a person may not manufacture more than how many firearms in California per calendar year?',['Three','One','Five','Ten'],0,'Penal Code 29010. (p. 34)'],
+['b24','sales','Generally, all firearm purchasers in California must be at least:',['21','18','19','25'],0,'There are exceptions. (p. 31)'],
+['b25','sales','It is generally illegal to manufacture, sell, give, lend, buy or receive a large-capacity magazine.',T,0,'Penal Code 32310 and 32311. (p. 36)'],
+/* ---- CH 6: CARRY, USE & PROHIBITIONS ---- */
+['l01','law','It is illegal for a person convicted of any felony offense to possess a firearm.',T,0,'(p. 39)',1],
+['l02','law','Generally, a person may legally have a loaded firearm, if otherwise lawful, at his or her campsite.',T,0,'Also at home and on private property they own or control. (p. 35)',1],
+['l03','law','It is illegal to buy, sell, or possess a firearm knowing its identification marks have been erased or altered.',T,0,'Penal Code 23920. (p. 36)',1],
+['l04','law','Without a CCW license, a handgun is NOT considered concealed in a vehicle if it is unloaded and:',['Locked in the trunk or in a locked container other than the glove or utility compartment','In the locked glove compartment','Under the seat','In the center console'],0,'Penal Code 25610 and 16850. (p. 34)'],
+['l05','law','A license to carry a concealed handgun may be granted by:',['A sheriff or a city police chief','The DMV','Any firearms dealer','The FSC instructor'],0,'(p. 34)'],
+['l06','law','In counties under 200,000 people, a licensing authority may issue a license to carry loaded and exposed in that county only.',T,0,'Penal Code 26150(b)(2). (p. 34)'],
+['l07','law','Carrying a firearm aboard a commercial passenger airplane is generally prohibited by federal and state law.',T,0,'Check with any common carrier in advance. (p. 34)'],
+['l08','law','Refusing to let a peace officer inspect a firearm you carry in public to see if it is loaded is:',['Grounds for arrest','Your right','An infraction only','Allowed if it is unloaded'],0,'Penal Code 25850(b). (p. 36)'],
+['l09','law','The right of self-defense ends when:',['There is no further danger from the assailant','The police arrive','The attacker runs out of ammunition','Ten seconds have passed'],0,'(p. 35)'],
+['l10','law','Using excessive force to counter an assault may result in civil or criminal penalties.',T,0,'(p. 35)'],
+['l11','law','Lethal force in self-defense requires a reasonable belief that:',['The danger is imminent and deadly force is necessary to prevent death or great bodily injury','Your property is at risk','You were insulted','The person is trespassing'],0,'Penal Code 197. (p. 35)'],
+['l12','law','A person who starts a fight can regain the right of self-defense if they try to stop and clearly communicate it, but the other person keeps fighting.',T,0,'(p. 36)'],
+['l13','law','It is illegal to carry a loaded firearm in a vehicle on a public street in an incorporated city, unless an exemption applies.',T,0,'Penal Code 25850. (p. 36)'],
+['l14','law','Openly carrying an unloaded handgun in a public place in an incorporated city is generally:',['Illegal','Legal','Legal if holstered','Legal during the day'],0,'Penal Code 26350. (p. 37)'],
+['l15','law','Unauthorized possession of a firearm on school grounds includes the campuses of the UC, CSU and community colleges.',T,0,'Penal Code 626.9. (p. 37)'],
+['l16','law','Bringing a firearm into a courtroom or courthouse without authorization is illegal.',T,0,'Penal Code 171b. (p. 37)'],
+['l17','law','Drawing or exhibiting a firearm in a rude, angry or threatening manner in front of another person (except in self-defense) is illegal:',['Whether the firearm is loaded or unloaded','Only if it is loaded','Only on public property','Only if someone is hurt'],0,'Penal Code 417. (p. 37)'],
+['l18','law','Willfully discharging a firearm in a grossly negligent manner that could injure or kill someone is illegal.',T,0,'Penal Code 246.3. (p. 37)'],
+['l19','law','A driver or owner who allows someone to discharge a firearm from their vehicle may be punished by up to:',['3 years in state prison','A $100 fine','6 months in county jail','No penalty'],0,'Penal Code 26100. (p. 38)'],
+['l20','law','Criminal storage of a firearm in the first degree involves a child or prohibited person getting your loaded firearm and causing:',['Death or great bodily injury','Any property damage','No injury','A noise complaint'],0,'Penal Code 25100(a). (p. 38)'],
+['l21','law','Criminal storage in the second degree includes a child or prohibited person getting your loaded firearm and carrying it to a public place.',T,0,'Or causing injury short of great bodily injury. (p. 38)'],
+['l22','law','Starting January 1, 2026, to be exempt from criminal storage charges, a firearm must be:',['"Securely stored" in, locked by, or disabled with a certified safety device or secure gun safe','Unloaded only','Hidden','In a holster'],0,'AB 53; Penal Code 25105 and 25145. (p. 38)'],
+['l23','law','A minor may possess a firearm when accompanied by a parent or guardian and engaged in a lawful recreational sporting, ranching or hunting activity.',T,0,'Penal Code 29610–29655. (p. 39)'],
+['l24','law','A minor at least how old may possess a firearm for a lawful sporting activity with prior written parental consent, without an adult present?',['16','12','14','17'],0,'(p. 39)'],
+['l25','law','Under California law, certain misdemeanor convictions prohibit firearm possession for:',['10 years','1 year','5 years','Life'],0,'Felonies: life. (p. 39)'],
+['l26','law','A Gun Violence Restraining Order (GVRO) prohibits the named person from:',['Owning, possessing, buying or receiving firearms and ammunition','Driving','Owning knives only','Leaving the county'],0,'(p. 39)'],
+['l27','law','Who may request a GVRO?',['Law enforcement, family members and other eligible people','Only judges','Only the person\'s employer','Only the district attorney'],0,'(p. 39)'],
+['l28','law','A long-term final GVRO lasts:',['Between one and five years','21 days','Life','6 months'],0,'Emergency and temporary GVROs last up to 21 days. (p. 39)'],
+['l29','law','A person served with a GVRO or domestic violence restraining order must relinquish their firearms within:',['24 hours','48 hours','5 days','30 days'],0,'To law enforcement or a licensed dealer. (p. 39)'],
+['l30','law','A person whose prohibition has a specific end date may store their firearms with a licensed dealer during the prohibition.',T,0,'Penal Code 29830. (p. 36)'],
+['l31','law','A person 18 or older who is not prohibited may have a loaded firearm at their place of business if engaged in a lawful business.',T,0,'Penal Code 26035. (p. 35)'],
+['l32','law','Federal law prohibits unlawful users of, or people addicted to, controlled substances from possessing firearms.',T,0,'(p. 39)'],
+['l33','law','It is illegal to draw or exhibit a firearm in a threatening manner at the occupant of a vehicle on a public street or highway.',T,0,'Penal Code 417.3. (p. 37)'],
+['l34','law','It is legal to discharge a firearm at an unoccupied building or vehicle if no one is inside.',T,1,'Except abandoned vehicles or with the owner\'s permission where otherwise lawful. (pp. 37–38)']
 ];
 const chapters=[
-['safe','Safety rules','The test is mostly common sense once these are automatic.',['Treat every firearm as loaded.','Point the muzzle only in a safe direction, where a discharge would hurt no one.','Finger off the trigger and outside the guard until your sights are on target and you have decided to shoot.','Know your target and what is beyond it; bullets ricochet and penetrate walls.','Use only the exact ammunition marked on the gun.','Wear eye and ear protection; hearing damage is permanent.','No alcohol, drugs or impairing medication with guns.','A safety is a mechanical device that can fail, not a substitute for handling.','Children: "Stop, don\'t touch, leave the area, tell an adult."']],
-['ops','How firearms work','Know the parts and actions well enough to open any gun and check it.',['Cartridge: case, primer, powder, bullet. Shotgun shell: hull, primer, powder, wad, shot.','Primer ignites the powder; rimfire primes in the rim, centerfire in the center.','Muzzle = front of barrel; chamber = where the round sits to fire.','Revolver: cylinder. Double-action: trigger cocks and fires. Single-action: cock by hand each shot.','Semi-automatic: one shot per pull, slide cycles and reloads from a magazine.','Long gun actions: bolt, lever, pump, semi-auto, break (hinge).','Gauge: smaller number = bigger bore. Rifling spins the bullet.']],
-['handle','Handling & malfunctions','The unloading order is the most-tested procedure.',['Semi-auto unload: muzzle safe, finger off, remove magazine FIRST, lock slide back, look and feel the chamber.','Revolver unload: open the cylinder and check every chamber.','Misfire: keep pointed safely and wait (common guidance: 30 seconds) for a hangfire before opening.','Squib (weak shot): stop, unload, check the bore. Never fire behind a stuck bullet.','Unload before cleaning; remove ammo from the area.','Hand guns over unloaded with the action open.','Lead: wash up, no eating or smoking while shooting.']],
-['store','Storage & children','California is strict here, and the law changed in 2026.',['"Child" means under 18 for criminal storage (PC 25100).','Every new gun comes with a DOJ-certified lock unless you prove you own a certified safe (PC 23635).','Living with a prohibited person: keep guns locked or disabled (PC 25135).','Since Jan 1, 2026: guns in a home must be locked or disabled unless carried or within your close control (PC 25145).','Hidden is not stored. Locked is stored. Store ammo separately and locked.']],
-['buy','Buying & transfers','Numbers live here. Memorize the key numbers grid.',['FSC: 30 questions, 23 to pass, $25, valid 5 years.','Handgun buyers: age 21, proof of identity and California residency, roster handguns only for new sales.','DROS, then a 10-day wait; take delivery within 30 days.','Safe handling demonstration at handgun delivery (PC 26850).','Private sales go through a dealer; parent/child and grandparent/grandchild transfers may skip the dealer but must be reported to DOJ.','Straw purchases and false statements are crimes.','Ammo: in person through a licensed vendor with a check; no bringing out-of-state ammo in yourself; no sales under 18.','Report a lost or stolen gun within 5 days. New residents report guns within 60 days.']],
-['carry','Transport & carry','How to legally move a gun without a license.',['In a vehicle: unloaded, in a locked container or the trunk. The glove box never counts.','"Loaded" includes a loaded magazine attached to the gun (PC 16840).','No concealed carry without a license; no open carry of unloaded handguns in public in cities.','School zone: 1,000 feet from K-12 grounds; unloaded and locked only.','Brandishing, negligent discharge and shooting at an occupied home or car are crimes.','Deadly force only against an imminent threat of death or great bodily injury.','Flying: unloaded, locked hard case, checked and declared.']],
-['prohib','Prohibited persons','Who can\'t own guns and for how long.',['Felony: life. Certain misdemeanors (domestic violence, brandishing): 10 years.','5150 admission as danger to self or others: 5 years.','Restraining order subjects: none while it is in effect; must relinquish.','GVRO petitioners: police, family or household members, employers, coworkers, school staff.','Narcotic addicts are prohibited. Handguns may not be furnished to minors except in supervised lawful activities.']]
+['rules','Chapter 1 · Firearm safety rules','pp. 4–6',['The six basic rules: (1) treat all firearms as if loaded; (2) keep it pointed in the safest possible direction; (3) finger off the trigger until ready to shoot; (4) know your target, its surroundings and beyond; (5) know how to properly operate your firearm; (6) store it safely and securely, with ammunition stored separately.','"The trigger is for firing; the handle is for handling."','Never shoot at a movement, color, sound or unidentifiable shape. If in doubt, don\'t shoot.','Never shoot in the air in celebration, or at water, flat or hard surfaces.','No guns when angry or depressed, after alcohol or drugs, or on drowsy medication.','Hand over and accept firearms only unloaded with the action open. Always wear eye and ear protection.']],
+['kids','Chapter 2 · Firearms and children','pp. 7–9',['A "child" is anyone under 18; misdemeanor or felony charges are possible if a child gets your gun.','A toddler\'s thumb has twice the strength of the other fingers, and the barrel ends up pointing at the child\'s face.','Rules for Kids: Stop. Don\'t Touch. Leave the Area. Tell an Adult.','Precautions apply even if you have no children: visitors count.','Store all firearms unloaded and secured, with ammunition in a separate place. Kids learn from what adults do.']],
+['ops','Chapter 3 · Operation and safe handling','pp. 10–25',['Cartridge = case, primer (impact-sensitive ignition), propellant, bullet. The bullet is just the projectile.','Caliber = barrel or bullet diameter. Common calibers: .22, .45, 9 mm. Pistols show caliber on the slide; revolvers on the barrel.','Fits ≠ safe. Never shoot old, dirty, corroded, wet or unidentified ammo; never throw ammo in the trash.','Dangerous range: most ammo travels at least a mile, some more than two; bullets penetrate interior walls.','Malfunction: stop firing, keep it pointed safely, wait 30 seconds, seek competent help. At a range, raise your non-shooting hand.','Semi-auto: remove the magazine FIRST, lock the slide back, check the chamber. Revolver (double-action): open the cylinder. Single-action revolver: open the loading gate.','A safety is not foolproof. Spinning a cylinder to an empty chamber does not unload a revolver.','Safe handling demonstrations are covered here but are not on the written test.']],
+['own','Chapter 4 · Firearm ownership','pp. 26–29',['Read the owner\'s manual; take a hands-on training course.','Clean the barrel after every use; unload and remove ammo before cleaning; ventilate; wash hands (lead).','Repairs only by a gunsmith or manufacturer. Modifications can be illegal and may void the warranty.','Trigger locks and cable locks stop firing but not handling or theft. Lock boxes and safes (safes usually 50+ lbs) stop access.','Maximum safety: a safety device AND a locked container, unloaded, ammo separate and locked.','Never store a gun in a bedside table, under a mattress or pillow, on a closet shelf, or with valuables unless locked.','Since Jan 1, 2026 (PC 25145): guns in a residence must be securely stored unless carried or within close proximity of a lawful user.']],
+['straw','Chapter 5 · Straw purchases','p. 30',['Straw purchase: buying for a prohibited person or someone who doesn\'t want their name on the sale.','Federal penalty: up to 15 years and $250,000.','Private transfers without a dealer can be a felony (PC 27545, 27590).']],
+['sales','Chapter 6 · Sales and transfers','pp. 31–34',['DROS + 10-day wait; buyers generally 21+; California DL or ID.','Private-party transfers go through a dealer, who holds the gun for the 10 days and may charge up to $10 per gun plus state fees.','Intra-familial (parent/child, grandparent/grandchild only): no dealer, but FSC first and a report to DOJ within 30 days (BOF 4544A).','Handgun proof of residency: utility bill (last 3 months), signed lease, deed, or California military orders; DROS address must match.','FSC: 75% to pass, $25, valid 5 years, $5 replacement. Safe handling demo in front of a DOJ Certified Instructor between DROS and delivery.','Every gun needs a DOJ-approved safety device or a signed affidavit that you own an approved lock box or safe.','Roster applies to dealer sales of new handguns; private-party, intra-familial and pawn returns are exempt.','New residents: report within 60 days ($19) or sell or transfer. Homemade guns need a DOJ serial number; max 3 per year unlicensed. Large-capacity magazines: no making, selling, buying or receiving.']],
+['law','Chapter 6 · Carry, self-defense and prohibitions','pp. 34–40',['No concealed handgun without a license (sheriff or police chief issues it). Unloaded in the trunk or a locked container (not the glove box) is not "concealed."','No loaded gun in public in a city; officers may inspect, and refusing is grounds for arrest. No open carry of unloaded handguns in cities.','Loaded is OK at your home, campsite, private property you control, or your lawful place of business (18+).','Lethal force: imminent danger, necessary to prevent death or great bodily injury. Self-defense ends when the danger ends; excessive force brings penalties.','Crimes: brandishing (PC 417), threatening vehicle occupants (417.3), grossly negligent discharge (246.3), shooting at occupied buildings or cars (246), shooting from a vehicle (owner up to 3 years), altering serial numbers.','Criminal storage 1st degree: death or great bodily injury. 2nd: injury or carried in public. 3rd: negligent storage where a child is likely to access it. From 2026, only "securely stored" guns are exempt.','Minors: with a parent at lawful activities; with a responsible adult and written consent; or 16+ with written consent.','Prohibited: felony (life), certain misdemeanors (10 years). GVRO/DVRO: surrender guns within 24 hours. GVRO: emergency or temporary up to 21 days, final 1–5 years.']]
 ];
-const nums=[['30','questions on the test'],['23','correct to pass (75%)'],['$25','test fee'],['5 yrs','FSC valid'],['21','age to buy a handgun'],['10 days','waiting period'],['30 days','to take delivery after DROS'],['18','"child" for storage law'],['1,000 ft','school zone'],['5 days','report lost or stolen'],['60 days','new resident report'],['10 yrs','certain misdemeanor ban'],['5 yrs','5150 ban'],['Life','felony ban']];
+const nums=[['30','questions on the test'],['75%','to pass (23 of 30)'],['$25','test and certificate'],['$5','replacement FSC'],['5 yrs','FSC valid'],['21','minimum buyer age (generally)'],['10 days','waiting period'],['30 sec','wait after a malfunction'],['18','"child" for storage law'],['16','minor with written consent'],['$10','max private-party dealer fee'],['30 days','report intra-family transfer'],['60 days','new resident report ($19)'],['3','homemade guns per year max'],['1+ mile','dangerous range'],['24 hrs','surrender guns under GVRO/DVRO'],['1–5 yrs','final GVRO length'],['10 yrs','certain misdemeanor ban'],['Life','felony ban'],['15 yrs','federal straw purchase penalty']];
 return {cats,Q,chapters,nums};
 }
 
@@ -1314,6 +1396,7 @@ function startQuiz(mode,cat){
   if(mode==='topic') pool=D.Q.filter(q=>q[1]===cat);
   if(mode==='weak') pool=D.Q.filter(q=>{const r=fscState().q[q[0]];return r&&(r[2]===0||r[1]>r[0]);});
   if(mode==='new') pool=D.Q.filter(q=>!fscState().q[q[0]]);
+  if(mode==='doj') pool=D.Q.filter(q=>q[6]===1);
   if(!pool.length){toast(mode==='weak'?'No weak spots yet. Take a practice round first.':'Nothing left in that set.');return;}
   let qs;
   if(mode==='exam'){ // balanced 30 across categories
@@ -1321,8 +1404,8 @@ function startQuiz(mode,cat){
     const keys=Object.keys(by); qs=[]; const sh=Object.fromEntries(keys.map(k=>[k,shuffle(by[k])]));
     let i=0; while(qs.length<30){const k=keys[i%keys.length]; if(sh[k].length) qs.push(sh[k].pop()); i++;}
     qs=shuffle(qs);
-  } else qs=shuffle(pool).slice(0,mode==='topic'?15:10);
-  qs=qs.map(q=>{ if(q[3].length<3) return q; const order=shuffle(q[3].map((_,i)=>i)); return [q[0],q[1],q[2],order.map(i=>q[3][i]),order.indexOf(q[4]),q[5]]; });
+  } else qs=shuffle(pool).slice(0,mode==='topic'?15:mode==='doj'?pool.length:10);
+  qs=qs.map(q=>{ if(q[3].length<3||q[3].some(o=>/^All of the above/.test(o))) return q; const order=shuffle(q[3].map((_,i)=>i)); return [q[0],q[1],q[2],order.map(i=>q[3][i]),order.indexOf(q[4]),q[5],q[6]]; });
   QZ={mode,cat,qs,i:0,ans:[],shown:false};
   renderFsc(); const el=document.getElementById('quiz'); if(el) el.scrollIntoView({block:'start'});
 }
@@ -1341,17 +1424,17 @@ function finishQuiz(){
 
 function renderFsc(){
   const v=document.getElementById('v-fsc'); const D=fscData(); const F=fscState();
-  const seen=Object.keys(F.q).length, mast=D.Q.filter(q=>mastered(q[0])).length;
+  const seen=D.Q.filter(q=>F.q[q[0]]).length, mast=D.Q.filter(q=>mastered(q[0])).length;
   const ex=F.exams.slice(-3); const best=F.exams.length?Math.max(...F.exams.map(e=>e.s)):null;
   const ready = ex.length>=2 && ex.slice(-2).every(e=>e.s>=27);
   const catStats=Object.keys(D.cats).map(k=>{const qs=D.Q.filter(q=>q[1]===k);const m=qs.filter(q=>mastered(q[0])).length;return {k,name:D.cats[k],n:qs.length,m};});
   let quiz='';
   if(QZ&&!QZ.done){
     const q=QZ.qs[QZ.i]; const sh=QZ.shown;
-    quiz=`<section class="card" id="quiz"><div class="card-h"><h3>${QZ.mode==='exam'?'Mock exam':QZ.mode==='topic'?esc(D.cats[QZ.cat]):QZ.mode==='weak'?'Weak spots':'Practice'}</h3><span class="mini">Question ${QZ.i+1} of ${QZ.qs.length}</span></div>
+    quiz=`<section class="card" id="quiz"><div class="card-h"><h3>${QZ.mode==='exam'?'Mock exam':QZ.mode==='topic'?esc(D.cats[QZ.cat]):QZ.mode==='weak'?'Weak spots':QZ.mode==='doj'?'Official DOJ self-tests':'Practice'}</h3><span class="mini">Question ${QZ.i+1} of ${QZ.qs.length}</span></div>
       <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
         <span class="meter" style="margin:0"><i style="width:${QZ.i/QZ.qs.length*100}%"></i></span>
-        <span class="eyebrow">${esc(D.cats[q[1]])}${q[2].length&&q[3].length===2?' · True or false':''}</span>
+        <span class="eyebrow">${esc(D.cats[q[1]])}${q[3].length===2?' · True or false':''}${q[6]?' · <span style="color:var(--signal)">Official DOJ self-test</span>':''}</span>
         <div style="font-size:17px;font-weight:600;line-height:1.4">${esc(q[2])}</div>
         <div style="display:flex;flex-direction:column;gap:8px">${q[3].map((o,k)=>{let st='';if(sh){if(k===q[4])st='border-color:var(--ok);background:var(--ok-soft);color:var(--ok)';else if(k===QZ.ans[QZ.i])st='border-color:var(--no);background:var(--no-soft);color:var(--no)';}
           return `<button class="btn qopt" data-k="${k}" style="text-align:left;padding:11px 14px;font-size:15px;${st}" ${sh?'disabled':''}><span class="mini" style="margin-right:8px">${'ABCD'[k]}</span>${esc(o)}</button>`}).join('')}</div>
@@ -1371,7 +1454,7 @@ function renderFsc(){
   }
   v.innerHTML = `
   <div class="hero" style="min-height:220px">${imgTag('papers','Application forms and a certificate on a desk')}
-    <div class="hero-in"><span class="eyebrow">Firearm Safety Certificate · ${D.Q.length} questions · 7 topics</span><h1 style="font-size:clamp(34px,6vw,54px)">Pass the FSC on the first try</h1>
+    <div class="hero-in"><span class="eyebrow">Firearm Safety Certificate · ${D.Q.length} questions · built from the 2025 DOJ study guide</span><h1 style="font-size:clamp(34px,6vw,54px)">Pass the FSC on the first try</h1>
     <p>Study the seven topics, memorize the numbers, drill by topic, then take 30-question mock exams until you score 27 or better twice in a row.</p></div></div>
   <div class="stats">
     <div class="stat"><span class="eyebrow">Readiness</span><span class="v" style="color:${ready?'var(--ok)':'inherit'}">${ready?'Ready':Math.round(mast/D.Q.length*100)+'%'}</span><span class="s">${ready?'Last two mocks 27+':'of questions mastered'}</span></div>
@@ -1384,6 +1467,7 @@ function renderFsc(){
     <button class="btn pri" data-start="exam">Take a 30-question mock exam</button>
     <button class="btn" data-start="practice">Quick 10</button>
     <button class="btn" data-start="new">Unseen questions</button>
+    <button class="btn" data-start="doj">Official DOJ self-tests (${D.Q.filter(q=>q[6]===1).length})</button>
     <button class="btn" data-start="weak">Weak spots</button>
   </div>
   ${F.exams.length?`<div class="bars" aria-label="Mock exam history"><span class="eyebrow">Mock exam history (pass line 23, target 27)</span>${F.exams.slice(-8).map(e=>`<div class="bar-row"><span class="lab">${fmtD(e.d)}</span><span class="trk"><span class="rng" style="left:${23/30*100}%;width:.4%;background:var(--ink)"></span><span class="spent" style="width:${e.s/30*100}%;background:${e.s>=27?'var(--ok)':e.s>=23?'var(--olive)':'var(--no)'}"></span></span><span class="num">${e.s}/30</span></div>`).join('')}</div>`:''}
@@ -1394,7 +1478,7 @@ function renderFsc(){
     <div class="acc-b" hidden><p style="color:var(--muted)">${esc(c[2])}</p><ul>${c[3].map(b=>`<li>${esc(b)}</li>`).join('')}</ul><div><button class="btn pri" data-start="topic" data-cat="${c[0]}">Drill ${s.n} ${esc(c[1].toLowerCase())} questions</button></div></div></div>`}).join('')}</div>
   <h2 class="sec">On test day</h2>
   <div class="callout"><p>At WBT (or any dealer), the test is 30 multiple-choice and true/false questions. Bring your ID. If you miss, you can retake after 24 hours; ask the dealer whether the $25 covers the retake, since practice varies. Read every word: "always" and "never" answers are usually about the safety rules, and law questions turn on exact numbers.</p></div>
-  <p class="foot">Built from California Penal Code sections and standard firearm-safety doctrine; the official DOJ study guide (oag.ca.gov) couldn't be read from here, so skim it once before the test. Recent laws (PC 25145 storage, 2026) may appear differently or not at all on the real test. Confidence: high on the safety rules and the key numbers; moderate on the exact wording the DOJ uses.</p>`;
+  <p class="foot">Built from the California DOJ <a href="https://oag.ca.gov/system/files/media/fsc-study-guide.pdf" target="_blank" rel="noopener">Firearm Safety Certificate Study Guide (2025)</a>, the source the test is written from. Questions marked Official DOJ self-test are the guide's own end-of-chapter questions; the rest are written from the guide's text, with page numbers in each explanation. Safe handling demonstration steps are in the guide but not on the written test.</p>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.addEventListener('click',()=>startQuiz(b.dataset.start,b.dataset.cat)));
   v.querySelectorAll('.qopt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.k)));
   const nx=v.querySelector('#qnext'); if(nx) nx.addEventListener('click',next);

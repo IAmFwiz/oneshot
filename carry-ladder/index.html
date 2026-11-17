@@ -323,6 +323,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
     <nav class="nav" aria-label="Sections">
       <a href="#overview" data-v="overview">Overview</a>
       <a href="#path" data-v="path">The Path</a>
+      <a href="#fsc" data-v="fsc">FSC Prep</a>
       <a href="#classes" data-v="classes">Classes</a>
       <a href="#calendar" data-v="calendar">Calendar</a>
       <a href="#standards" data-v="standards">Standards</a>
@@ -338,6 +339,7 @@ h2.sec{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1
   <div class="wrap">
     <section class="view" id="v-overview"></section>
     <section class="view" id="v-path" hidden></section>
+    <section class="view" id="v-fsc" hidden></section>
     <section class="view" id="v-classes" hidden></section>
     <section class="view" id="v-calendar" hidden></section>
     <section class="view" id="v-standards" hidden></section>
@@ -724,6 +726,7 @@ const SUGGEST = {'hyve-ed':'2027-01-30','msp':'2027-02-27','taccon':'2027-04-02'
 const OLDSTEPS = Object.fromEntries(OLD.phases.flatMap(p=>p.steps).map(s=>[s.id,s]));
 const STEPS = Object.assign({}, OLDSTEPS, NEW_STEPS);
 (function patch(){
+  if(STEPS.s3){ STEPS.s3.links=(STEPS.s3.links||[]).concat([['Study and take mock exams in FSC Prep','#fsc']]); STEPS.s3.one='$25, 30 questions, 23 to pass. Study in the FSC Prep tab, then test at the dealer when you buy.'; }
   Object.assign(STEPS.s1,{short:'CCW Pro account',title:'Open your CCW Pro account and gather documents',one:'Do everything but submit. The portal needs a gun before it accepts the application.',
    body:`<p>Create the account now and fill in every section you can: personal history, residence, employment, references. CCW Pro won't let you submit until a firearm is entered, so the submit step moves to Tier 1, right after you buy. Having the rest done means you can submit within minutes of getting the serial number.</p>
    <ul><li>References: three. If you're married, your spouse must be one of them, and a spouse satisfies both reference rules.</li><li>Disclose everything. Since Jan 2026 (AB 1078), inaccurate or incomplete answers require denial or revocation.</li><li>Cannabis use is a disqualifier.</li><li>Scan two monthly proofs of residence (utility, phone, bank; no P.O. box) and your CA license.</li></ul>`,
@@ -743,7 +746,7 @@ const LS = {
   get(k,d){try{const v=localStorage.getItem('cl:'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem('cl:'+k,JSON.stringify(v))}catch(e){}}
 };
-let ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},buy:{},updatedAt:0}, LS.get('state',{}));
+let ST = Object.assign({done:{},course:{},logs:{},spent:{},notes:{},buy:{},fsc:{q:{},exams:[]},updatedAt:0}, LS.get('state',{}));
 const UI = {open:new Set(), cFilter:LS.get('cFilter','all'), cStatus:LS.get('cStatus','any'), hideDone:LS.get('hideDone',false), pFilter:LS.get('pFilter','all'), pQuery:'', zQuery:'', calAll:LS.get('calAll',false)};
 
 let remote = null, saveT = null, saving = false, pending = false;
@@ -1043,8 +1046,8 @@ function renderPlaces(){
 }
 
 /* ---------- ROUTER ---------- */
-const VIEWS=['overview','path','classes','calendar','standards','buy','budget','rules','places'];
-const R={overview:renderOverview,path:renderPath,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,buy:renderBuy,budget:renderBudget,rules:renderRules,places:renderPlaces};
+const VIEWS=['overview','path','fsc','classes','calendar','standards','buy','budget','rules','places'];
+const R={overview:renderOverview,path:renderPath,fsc:renderFsc,classes:renderClasses,calendar:renderCalendar,standards:renderStandards,buy:renderBuy,budget:renderBudget,rules:renderRules,places:renderPlaces};
 let cur='overview';
 function updateHeader(){const n=ALL.filter(id=>ST.done[id]).length;document.getElementById('hcount').innerHTML=`<b>${n}</b>/${ALL.length} steps`;}
 function rerender(){
@@ -1170,5 +1173,233 @@ function renderBuy(){
   <h2 class="sec">Changes coming</h2>${list(B.coming)}
   <p class="foot">Confidence: high on the legal rules and the AB 1127 and Glock 43X facts; moderate on individual roster SKUs, which come from retailers and advocacy groups rather than the DOJ page itself. Roster status changes as Boland v. Bonta proceeds. Prices are retailer listings or blank where unverified.</p>`;
   v.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click',()=>{const [id,s]=b.dataset.buy.split('|');ST.buy=ST.buy||{};if(!s)delete ST.buy[id];else ST.buy[id]=s;commit(s?(s==='want'?'Added to your list':'Marked bought'):'Cleared');}));
+}
+
+/* ---------- FSC PREP ---------- */
+function fscData(){
+const T=['True','False'];
+const cats={safe:'Safety rules',ops:'How firearms work',handle:'Handling & malfunctions',store:'Storage & children',buy:'Buying & transfers',carry:'Transport & carry',prohib:'Prohibited persons'};
+const Q=[
+/* SAFETY RULES */
+['s01','safe','What is the first and most basic rule of firearm safety?',['Treat every firearm as if it is loaded','Always use the mechanical safety','Keep firearms clean and oiled','Store ammunition separately'],0,'Every other safety habit assumes this one. Most accidents involve a gun someone "knew" was unloaded.'],
+['s02','safe','If you have checked that a gun is unloaded, it is OK to point it at a person as long as your finger is off the trigger.',T,1,'Never point a firearm at anything you are not willing to destroy, loaded or not.'],
+['s03','safe','Where should your trigger finger be until your sights are on the target and you have decided to shoot?',['Outside the trigger guard, straight along the frame','Resting lightly on the trigger','Inside the trigger guard behind the trigger','On the safety lever'],0,'Finger off the trigger and outside the guard prevents most unintentional discharges.'],
+['s04','safe','A "safe direction" is one where:',['An unintentional discharge would not injure anyone or cause damage','The muzzle points at the ground, always','The muzzle points straight up','The muzzle points at a wall'],0,'No single direction is always safe. The ground can cause ricochets; a bullet fired upward comes down; walls may not stop a bullet.'],
+['s05','safe','A mechanical safety is a reliable substitute for safe gun handling.',T,1,'Safeties can fail or be left off. Safe handling is the real safety.'],
+['s06','safe','Before you fire, you must be sure of:',['Your target and what is beyond it','The wind direction only','The brand of ammunition','How many rounds are left'],0,'Bullets can pass through targets and walls and travel a long way.'],
+['s07','safe','Which ammunition should you use?',['Only the exact caliber or gauge marked on the barrel or slide','Any cartridge that fits in the chamber','Any cartridge of similar size','Whatever is cheapest'],0,'The wrong cartridge can destroy the firearm and injure you even if it chambers.'],
+['s08','safe','Alcohol, drugs and some prescription medications should never be combined with handling or shooting firearms.',T,0,'Impairment slows reactions and judgment. Check medication labels too.'],
+['s09','safe','Eye and ear protection should be worn:',['Every time you shoot, by shooters and spectators','Only at indoor ranges','Only with rifles','Only after 50 rounds'],0,'Gunfire causes permanent hearing loss and can throw debris and brass.'],
+['s10','safe','When someone hands you a firearm and says it is unloaded, you should:',['Open the action and check it yourself','Trust them if you know them','Check only the magazine','Dry fire it to confirm'],0,'Always check every firearm yourself, every time it changes hands.'],
+['s11','safe','Shooting at water or a hard, flat surface is safe because the bullet stops there.',T,1,'Bullets ricochet off water, rock and pavement.'],
+['s12','safe','Which statement about children and guns is true?',['Children may not be able to tell real guns from toys and may handle a gun they find','Children always know a real gun when they see one','Children will not touch a gun if told once','Only teenagers are at risk'],0,'Curiosity is the danger. Locking guns up is what actually prevents access.'],
+['s13','safe','If a child finds a gun, teach them to:',['Stop, don\'t touch it, leave the area and tell an adult','Pick it up carefully and bring it to an adult','Unload it','Hide it so no one gets hurt'],0,'The standard child safety message never involves touching the gun.'],
+['s14','safe','Hearing damage from gunfire is:',['Permanent and cumulative','Always temporary','Only a concern with rifles','Only a concern indoors'],0,'Each unprotected exposure adds up and does not heal.'],
+['s15','safe','Before crossing a fence or climbing with a firearm, you should unload it and open the action.',T,0,'A fall with a loaded gun is a classic cause of hunting accidents.'],
+/* HOW FIREARMS WORK */
+['o01','ops','The four components of a modern rifle or pistol cartridge are:',['Case, primer, powder and bullet','Hull, wad, shot and cap','Slug, sabot, case and flint','Barrel, chamber, case and bullet'],0,'Hull, wad and shot describe a shotgun shell.'],
+['o02','ops','Which part of a cartridge ignites the powder when struck?',['Primer','Bullet','Case mouth','Wad'],0,'The firing pin or striker hits the primer, which ignites the powder.'],
+['o03','ops','The "muzzle" is:',['The front end of the barrel where the projectile exits','The rear of the slide','The handle of the gun','The part that holds cartridges'],0,'Muzzle direction is what the safety rules are about.'],
+['o04','ops','The chamber is:',['The part of the barrel that holds the cartridge ready to fire','The magazine well','The trigger guard','The cylinder release'],0,'A round in the chamber means the gun can fire.'],
+['o05','ops','In a revolver, cartridges are held in a:',['Cylinder','Detachable magazine','Tube magazine','Clip'],0,'Each chamber in the cylinder rotates behind the barrel.'],
+['o06','ops','A double-action revolver can be fired by:',['A trigger pull alone, which cocks and releases the hammer','Only cocking the hammer by hand first','Only pressing the cylinder release','Pulling the trigger twice per shot'],0,'Most double-action revolvers can also be cocked manually first (single-action).'],
+['o07','ops','A single-action revolver requires:',['Cocking the hammer by hand before each shot','No hammer at all','Pulling the trigger twice','A magazine'],0,'The trigger only releases the hammer; it does not cock it.'],
+['o08','ops','Most semi-automatic pistols feed cartridges from:',['A detachable magazine in the grip','A rotating cylinder','A tube under the barrel','Loose rounds dropped in the chamber'],0,'That is why removing the magazine comes first when unloading.'],
+['o09','ops','A semi-automatic firearm fires one shot per trigger pull and automatically chambers the next round.',T,0,'Firing more than one shot per pull is fully automatic, which is illegal for civilians in California.'],
+['o10','ops','Which shotgun has the larger bore?',['12 gauge','20 gauge','28 gauge','They are identical'],0,'Smaller gauge number means larger bore.'],
+['o11','ops','In a rimfire cartridge, the priming compound is located:',['In the rim of the case','In a cup in the center of the case head','In the bullet','In the powder'],0,'Centerfire cartridges have a primer in the center of the case head.'],
+['o12','ops','Which are common rifle and shotgun action types?',['Bolt, lever, pump, semi-automatic and break (hinge)','Cylinder, slide and clip only','Flintlock only','Striker and hammer only'],0,'Know how to open each type to check that it is unloaded.'],
+['o13','ops','Rifling, the spiral grooves inside a barrel, makes the bullet:',['Spin for stability and accuracy','Travel faster than sound','Fragment on impact','Leave less residue'],0,'Most shotgun barrels are smoothbore, without rifling.'],
+['o14','ops','Firing a cartridge of the wrong caliber can damage the gun and injure the shooter even if it fits in the chamber.',T,0,'Check the barrel or slide markings against the headstamp on the cartridge.'],
+['o15','ops','In a shotgun shell, the wad:',['Separates the powder from the shot','Ignites the powder','Is the outer hull','Is the projectile'],0,'The wad seals the gas and holds the shot together.'],
+['o16','ops','On a semi-automatic pistol, the slide:',['Moves rearward when fired, ejecting the empty case and loading the next round','Holds the cartridges','Is the safety','Never moves'],0,'Locking the slide back is how you open the action to inspect the chamber.'],
+/* HANDLING */
+['h01','handle','With the muzzle in a safe direction and finger off the trigger, what is the FIRST step to unload a semi-automatic pistol?',['Remove the magazine','Pull the slide back','Pull the trigger','Engage the safety and stop'],0,'If you rack the slide first, the magazine loads a new round into the chamber.'],
+['h02','handle','After removing the magazine from a semi-automatic pistol, you must:',['Lock the slide back and visually and physically check that the chamber is empty','Consider it unloaded','Pull the trigger to clear it','Reinsert the magazine'],0,'Look and feel. A round can remain in the chamber.'],
+['h03','handle','A semi-automatic pistol with its magazine removed is always unloaded.',T,1,'A cartridge can still be in the chamber, and some pistols fire with the magazine out.'],
+['h04','handle','To check that a revolver is unloaded:',['Open the cylinder and look at every chamber','Look at the front of the cylinder','Pull the trigger','Cock the hammer'],0,'Swing out or open the cylinder and inspect each chamber.'],
+['h05','handle','You pull the trigger and the gun does not fire. What should you do?',['Keep it pointed in a safe direction and wait before opening the action, in case of a delayed firing','Look down the barrel','Open the action immediately','Hand it to someone else'],0,'A hangfire can fire late. Common guidance is to wait at least 30 seconds.'],
+['h06','handle','A "hangfire" is:',['A delay between the primer being struck and the cartridge firing','A bullet stuck in the barrel','A cartridge that fires twice','A worn firing pin'],0,'That is why you wait with the muzzle in a safe direction after a misfire.'],
+['h07','handle','A "squib load" is:',['A cartridge that fires with too little power and may leave the bullet stuck in the barrel','A high-power cartridge','A blank round','A shotgun shell'],0,'Firing another round behind a stuck bullet can burst the barrel.'],
+['h08','handle','A shot sounds or feels unusually weak. You should:',['Stop, unload and check the barrel for an obstruction','Fire again to push it out','Speed up','Clean the slide'],0,'Never fire again until the bore is confirmed clear.'],
+['h09','handle','Before cleaning, a firearm must be unloaded and all ammunition removed from the cleaning area.',T,0,'Many accidental discharges happen during cleaning.'],
+['h10','handle','You reduce lead exposure at the range by:',['Washing hands and face afterward and not eating, drinking or smoking while shooting','Wearing ear protection','Shooting faster','Using a revolver'],0,'Lead from primers and bullets settles on skin and clothes.'],
+['h11','handle','When handing a firearm to another person, it should be:',['Unloaded with the action open','Loaded with the safety on','Holstered','Muzzle-first'],0,'An open action lets both people see that it is empty.'],
+['h12','handle','A barrel obstruction such as mud, snow or a stuck bullet can:',['Cause the barrel to burst when fired','Improve accuracy','Only affect cleaning','Nothing serious'],0,'Check the bore whenever an obstruction is possible.'],
+['h13','handle','A dropped loaded firearm can fire.',T,0,'Do not try to catch a falling gun.'],
+['h14','handle','If you are unfamiliar with a firearm, you should:',['Read the owner\'s manual or get instruction before handling or loading it','Learn by test-firing it','Ask the seller to load it','Dry fire it with ammunition nearby'],0,'Know how the gun works before you use it.'],
+['h15','handle','Dry fire practice should only be done:',['After confirming the gun is unloaded, with no ammunition in the room, pointed at a safe backstop','Anywhere if the safety is on','With a round in the magazine','Pointed at a mirror or window'],0,'Remove ammunition from the room so a loaded gun can\'t sneak into practice.'],
+/* STORAGE */
+['st01','store','For California\'s criminal storage laws, a "child" is anyone under the age of:',['18','16','14','21'],0,'Penal Code 25100.'],
+['st02','store','In California you can be charged with a crime if a child gets your negligently stored loaded firearm and injures someone.',T,0,'Criminal storage can be charged even without injury in some cases; injury or death makes it more serious.'],
+['st03','store','Every firearm sold by a California dealer must include:',['A DOJ-certified firearm safety device, unless you show proof of owning a DOJ-certified safe or lock box','A free box of ammunition','A cleaning kit','A holster'],0,'Penal Code 23635.'],
+['st04','store','If you live with someone who is prohibited from having firearms, you must:',['Keep your firearms in a locked container or DOJ-approved safe, or disabled with a locking device','Give them a key so they can find it','Do nothing special','Only keep long guns'],0,'Penal Code 25135.'],
+['st05','store','The safest way to store firearms at home is:',['Unloaded, locked in a safe or with a locking device, with ammunition stored separately and locked','Loaded in a nightstand drawer','Hidden on a high shelf','In a closet under clothes'],0,'Locking is what stops access by children, visitors and thieves.'],
+['st06','store','Hiding a gun in a closet or drawer is adequate storage if your children don\'t know it is there.',T,1,'Children find hidden guns. Lock them.'],
+['st07','store','A loaded gun on a high shelf should still be considered accessible to children.',T,0,'Children climb.'],
+['st08','store','A gun safe or lock primarily prevents:',['Unauthorized access by children and others, and theft','Rust','Accidental discharge during cleaning','Lead exposure'],0,'Storage is about who can get to the gun.'],
+['st09','store','Since Jan 1, 2026 (Penal Code 25145), a firearm in a home must be:',['Locked in a certified container or disabled with a certified lock unless it is carried or within your close control','Stored loaded for emergencies','Registered with the city','Kept in the garage'],0,'New law: the printed DOJ guide may not mention it yet, but it is the law now.'],
+['st10','store','Teaching children about gun safety removes the need to lock up firearms.',T,1,'Education helps; locked storage is still required.'],
+['st11','store','When guests with children visit, you should:',['Make sure every firearm is locked and inaccessible','Show the children where the guns are','Unload the guns but leave them out','Nothing, if the guns are unloaded'],0,'Visitors are part of the risk.'],
+['st12','store','Ammunition should be stored:',['In a cool, dry, locked place, separate from firearms','Next to the stove','Loose in a vehicle','In the gun at all times'],0,'Separate, locked storage adds another barrier.'],
+['st13','store','If a household member may be at risk of suicide, a responsible step is to:',['Store firearms away from the home temporarily or seek a Gun Violence Restraining Order','Hide the key','Unload them only','Do nothing unless asked'],0,'Removing access during a crisis saves lives.'],
+/* BUYING */
+['b01','buy','To buy or receive almost any firearm in California, you need:',['A valid Firearm Safety Certificate (FSC)','A hunting license','A CCW license','A gun club membership'],0,'Some groups are exempt, including CCW holders and peace officers.'],
+['b02','buy','An FSC is valid for:',['5 years','1 year','10 years','Life'],0,'Renew by retaking the test.'],
+['b03','buy','To pass the 30-question FSC test, you must answer at least how many correctly?',['23','20','25','27'],0,'75% is 23 of 30.'],
+['b04','buy','The minimum age to buy a handgun from a California dealer is:',['21','18','19','25'],0,'California also restricts most long gun sales to those under 21, with exceptions.'],
+['b05','buy','California\'s waiting period between purchase and delivery is:',['10 days','3 days','5 days','30 days'],0,'The background check runs during the wait.'],
+['b06','buy','A private sale between two Californians who are not exempt family must be done:',['Through a licensed California firearms dealer','In a parking lot with a bill of sale','By mail','Any way they agree'],0,'The dealer runs the background check and the 10-day wait.'],
+['b07','buy','A transfer between a parent and child, or grandparent and grandchild:',['Can be made without a dealer, but must be reported to DOJ','Is never allowed','Must always go through a dealer','Needs no paperwork'],0,'The intrafamily exemption still requires a report to DOJ.'],
+['b08','buy','When you take delivery of a handgun from a dealer, you must:',['Perform a safe handling demonstration','Fire it at the store','Show a hunting license','Sign a waiver'],0,'Penal Code 26850.'],
+['b09','buy','You may buy a gun for a friend who cannot pass the background check if no money changes hands.',T,1,'That is a "straw purchase", a serious crime.'],
+['b10','buy','A dealer can sell a new handgun only if:',['It is on the DOJ Roster of Certified Handguns','It is under $1,000','It is a revolver','The buyer has a CCW'],0,'Off-roster handguns can only be transferred used, through a dealer, in limited cases.'],
+['b11','buy','When you buy a firearm, the dealer submits your information to DOJ on a:',['Dealer Record of Sale (DROS)','Form 4473 only','Bill of sale','Hunting tag'],0,'The DROS starts the background check and the 10-day wait.'],
+['b12','buy','You must take delivery within how many days of the DROS, or the sale must be redone?',['30','10','60','90'],0,'Set by DOJ rules: after 30 days the DROS must be redone.'],
+['b13','buy','Giving false information on a firearm purchase form is:',['A crime','A minor paperwork issue','Allowed if corrected later','Only a federal concern'],0,'False statements on DROS or federal forms are prosecuted.'],
+['b14','buy','In California, ammunition is bought:',['From a licensed vendor, in person, with an eligibility check','Online shipped to your door','From anyone at a gun show without checks','Only at ranges'],0,'Online orders ship to a vendor, who completes the check.'],
+['b15','buy','New residents bringing firearms into California must report them to DOJ within:',['60 days','10 days','30 days','1 year'],0,'Penal Code 27560. Starting in 2028, new residents will also need an FSC within 180 days.'],
+['b16','buy','You may buy ammunition in another state and bring it into California yourself.',T,1,'Penal Code 30314 bars residents from bringing in out-of-state ammunition themselves.'],
+['b17','buy','A lost or stolen firearm must be reported to local law enforcement within:',['5 days of when you knew or should have known','30 days','48 hours of purchase','1 year'],0,'Penal Code 25250.'],
+['b18','buy','Buying a handgun requires proof of identity and proof of:',['California residency','A hunting license','Gun club membership','A CCW'],0,'Bring a utility bill, lease or similar along with your ID.'],
+['b19','buy','Selling ammunition to a person under 18 is:',['Illegal','Legal with a note from a parent','Legal for rifle ammo','Legal at ranges'],0,'Handgun ammunition generally cannot be sold to anyone under 21.'],
+/* TRANSPORT & CARRY */
+['c01','carry','Without a carry license, a handgun in a vehicle must be:',['Unloaded and in a locked container or the trunk','Loaded in the glove compartment','Unloaded on the seat','In a holster on your belt'],0,'Penal Code 25610.'],
+['c02','carry','A locked glove compartment counts as a "locked container" for transporting a handgun.',T,1,'The law specifically excludes the glove compartment and utility compartment.'],
+['c03','carry','Under California law, a firearm is considered "loaded" when:',['A cartridge is in the chamber or in a magazine attached to the gun','Only when a round is in the chamber','Only when the hammer is cocked','Only when ammunition is in the same car'],0,'Penal Code 16840: an attached loaded magazine makes the gun loaded.'],
+['c04','carry','Carrying a concealed handgun in public without a CCW license is:',['Illegal','Legal if unloaded','Legal in your own city','Legal at night'],0,'Penal Code 25400.'],
+['c05','carry','Openly carrying an unloaded handgun in public in an incorporated city is:',['Generally illegal','Legal if it is visible','Legal on weekends','Legal near schools'],0,'Penal Code 26350.'],
+['c06','carry','A gun-free school zone extends how far from the grounds of a K-12 school?',['1,000 feet','500 feet','100 yards','1 mile'],0,'Penal Code 626.9.'],
+['c07','carry','Within a school zone, an unlicensed person may transport a handgun only if it is:',['Unloaded and in a locked container or a vehicle\'s locked trunk','Loaded in a holster','Unloaded on the dashboard','In a backpack'],0,'Penal Code 626.9 exceptions.'],
+['c08','carry','Drawing or showing a firearm in a rude, angry or threatening manner (other than in lawful self-defense) is:',['A crime called brandishing','Legal if unloaded','Legal on private property','Only a traffic violation'],0,'Penal Code 417.'],
+['c09','carry','It is legal to carry a loaded handgun on your car\'s passenger seat without a license if it is in a holster.',T,1,'Without a license it must be unloaded and locked or in the trunk.'],
+['c10','carry','Without a license, carry a handgun between your car and your home or a range:',['Unloaded, in a locked container','Loaded in your waistband','Unloaded in your hand','Loaded in a bag'],0,'Same rule as in the vehicle.'],
+['c11','carry','To fly with a firearm, it must be:',['Unloaded, in a locked hard-sided case, in checked baggage and declared to the airline','In your carry-on','Unloaded in your pocket','Shipped separately only'],0,'TSA and airline rules.'],
+['c12','carry','Firing a gun in a grossly negligent way that could injure someone is a crime even if no one is hurt.',T,0,'Penal Code 246.3.'],
+['c13','carry','Shooting at an inhabited home or occupied vehicle is:',['A felony','A misdemeanor','An infraction','Legal on your property'],0,'Penal Code 246.'],
+['c14','carry','Deadly force in self-defense is justified only when you reasonably believe:',['You or another person face imminent death or great bodily injury','Someone insulted you','Property is being stolen','Someone is trespassing'],0,'The threat must be imminent and the response reasonable.'],
+/* PROHIBITED PERSONS */
+['p01','prohib','A person convicted of a felony is prohibited from owning firearms:',['For life','For 10 years','For 5 years','Until probation ends'],0,'Penal Code 29800.'],
+['p02','prohib','Certain misdemeanor convictions, such as domestic violence or brandishing, prohibit firearm possession in California for:',['10 years','1 year','5 years','Life'],0,'Penal Code 29805. Federal law separately bans people with a domestic violence misdemeanor conviction for life.'],
+['p03','prohib','A person taken into custody as a danger to self or others (a "5150" hold) and admitted is prohibited for:',['5 years','6 months','1 year','10 years'],0,'Welfare and Institutions Code 8103.'],
+['p04','prohib','A person subject to a domestic violence restraining order:',['May not own or possess firearms while it is in effect, and must relinquish them','May keep guns at home','May keep long guns','Is affected only after a conviction'],0,'Family Code 6389.'],
+['p05','prohib','Who can petition for a Gun Violence Restraining Order (GVRO)?',['Law enforcement, family or household members, employers, coworkers and school staff','Only police','Only a judge','Anyone in the state'],0,'California expanded the list of petitioners in 2020.'],
+['p06','prohib','A GVRO:',['Temporarily prohibits a person from having firearms and ammunition','Is a criminal conviction','Permanently bans firearms','Only applies to handguns'],0,'It is a civil order issued by a court.'],
+['p07','prohib','A person addicted to narcotics is prohibited from possessing firearms.',T,0,'Penal Code 29800.'],
+['p08','prohib','Furnishing a handgun to a minor (under 18) is:',['Illegal, except for limited supervised lawful activities','Legal with parental consent','Legal for target shooting anywhere','Legal on private land'],0,'Penal Code 27505 and 29610.'],
+['p09','prohib','Criminal storage penalties increase if a child uses your gun to injure or kill someone.',T,0,'It can be charged as a felony.'],
+['p10','prohib','If you become a prohibited person, you must:',['Relinquish your firearms as the law and court require','Keep them locked at home','Transfer them to a roommate','Only stop buying new ones'],0,'Courts set deadlines and require proof of relinquishment.']
+];
+const chapters=[
+['safe','Safety rules','The test is mostly common sense once these are automatic.',['Treat every firearm as loaded.','Point the muzzle only in a safe direction, where a discharge would hurt no one.','Finger off the trigger and outside the guard until your sights are on target and you have decided to shoot.','Know your target and what is beyond it; bullets ricochet and penetrate walls.','Use only the exact ammunition marked on the gun.','Wear eye and ear protection; hearing damage is permanent.','No alcohol, drugs or impairing medication with guns.','A safety is a mechanical device that can fail, not a substitute for handling.','Children: "Stop, don\'t touch, leave the area, tell an adult."']],
+['ops','How firearms work','Know the parts and actions well enough to open any gun and check it.',['Cartridge: case, primer, powder, bullet. Shotgun shell: hull, primer, powder, wad, shot.','Primer ignites the powder; rimfire primes in the rim, centerfire in the center.','Muzzle = front of barrel; chamber = where the round sits to fire.','Revolver: cylinder. Double-action: trigger cocks and fires. Single-action: cock by hand each shot.','Semi-automatic: one shot per pull, slide cycles and reloads from a magazine.','Long gun actions: bolt, lever, pump, semi-auto, break (hinge).','Gauge: smaller number = bigger bore. Rifling spins the bullet.']],
+['handle','Handling & malfunctions','The unloading order is the most-tested procedure.',['Semi-auto unload: muzzle safe, finger off, remove magazine FIRST, lock slide back, look and feel the chamber.','Revolver unload: open the cylinder and check every chamber.','Misfire: keep pointed safely and wait (common guidance: 30 seconds) for a hangfire before opening.','Squib (weak shot): stop, unload, check the bore. Never fire behind a stuck bullet.','Unload before cleaning; remove ammo from the area.','Hand guns over unloaded with the action open.','Lead: wash up, no eating or smoking while shooting.']],
+['store','Storage & children','California is strict here, and the law changed in 2026.',['"Child" means under 18 for criminal storage (PC 25100).','Every new gun comes with a DOJ-certified lock unless you prove you own a certified safe (PC 23635).','Living with a prohibited person: keep guns locked or disabled (PC 25135).','Since Jan 1, 2026: guns in a home must be locked or disabled unless carried or within your close control (PC 25145).','Hidden is not stored. Locked is stored. Store ammo separately and locked.']],
+['buy','Buying & transfers','Numbers live here. Memorize the key numbers grid.',['FSC: 30 questions, 23 to pass, $25, valid 5 years.','Handgun buyers: age 21, proof of identity and California residency, roster handguns only for new sales.','DROS, then a 10-day wait; take delivery within 30 days.','Safe handling demonstration at handgun delivery (PC 26850).','Private sales go through a dealer; parent/child and grandparent/grandchild transfers may skip the dealer but must be reported to DOJ.','Straw purchases and false statements are crimes.','Ammo: in person through a licensed vendor with a check; no bringing out-of-state ammo in yourself; no sales under 18.','Report a lost or stolen gun within 5 days. New residents report guns within 60 days.']],
+['carry','Transport & carry','How to legally move a gun without a license.',['In a vehicle: unloaded, in a locked container or the trunk. The glove box never counts.','"Loaded" includes a loaded magazine attached to the gun (PC 16840).','No concealed carry without a license; no open carry of unloaded handguns in public in cities.','School zone: 1,000 feet from K-12 grounds; unloaded and locked only.','Brandishing, negligent discharge and shooting at an occupied home or car are crimes.','Deadly force only against an imminent threat of death or great bodily injury.','Flying: unloaded, locked hard case, checked and declared.']],
+['prohib','Prohibited persons','Who can\'t own guns and for how long.',['Felony: life. Certain misdemeanors (domestic violence, brandishing): 10 years.','5150 admission as danger to self or others: 5 years.','Restraining order subjects: none while it is in effect; must relinquish.','GVRO petitioners: police, family or household members, employers, coworkers, school staff.','Narcotic addicts are prohibited. Handguns may not be furnished to minors except in supervised lawful activities.']]
+];
+const nums=[['30','questions on the test'],['23','correct to pass (75%)'],['$25','test fee'],['5 yrs','FSC valid'],['21','age to buy a handgun'],['10 days','waiting period'],['30 days','to take delivery after DROS'],['18','"child" for storage law'],['1,000 ft','school zone'],['5 days','report lost or stolen'],['60 days','new resident report'],['10 yrs','certain misdemeanor ban'],['5 yrs','5150 ban'],['Life','felony ban']];
+return {cats,Q,chapters,nums};
+}
+
+var QZ=null; // active quiz session
+function fscState(){ ST.fsc=ST.fsc||{q:{},exams:[]}; ST.fsc.q=ST.fsc.q||{}; ST.fsc.exams=ST.fsc.exams||[]; return ST.fsc; }
+function quietSave(){ ST.updatedAt=Date.now(); LS.set('state',ST); if(remote){ setSync('saving','Saving…'); clearTimeout(saveT); saveT=setTimeout(flush,900);} }
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mastered(id){const r=fscState().q[id];return r&&r[2]===1&&r[0]>=1;}
+
+function startQuiz(mode,cat){
+  const D=fscData(); let pool=D.Q;
+  if(mode==='topic') pool=D.Q.filter(q=>q[1]===cat);
+  if(mode==='weak') pool=D.Q.filter(q=>{const r=fscState().q[q[0]];return r&&(r[2]===0||r[1]>r[0]);});
+  if(mode==='new') pool=D.Q.filter(q=>!fscState().q[q[0]]);
+  if(!pool.length){toast(mode==='weak'?'No weak spots yet. Take a practice round first.':'Nothing left in that set.');return;}
+  let qs;
+  if(mode==='exam'){ // balanced 30 across categories
+    const by={};D.Q.forEach(q=>(by[q[1]]=by[q[1]]||[]).push(q));
+    const keys=Object.keys(by); qs=[]; const sh=Object.fromEntries(keys.map(k=>[k,shuffle(by[k])]));
+    let i=0; while(qs.length<30){const k=keys[i%keys.length]; if(sh[k].length) qs.push(sh[k].pop()); i++;}
+    qs=shuffle(qs);
+  } else qs=shuffle(pool).slice(0,mode==='topic'?15:10);
+  qs=qs.map(q=>{ if(q[3].length<3) return q; const order=shuffle(q[3].map((_,i)=>i)); return [q[0],q[1],q[2],order.map(i=>q[3][i]),order.indexOf(q[4]),q[5]]; });
+  QZ={mode,cat,qs,i:0,ans:[],shown:false};
+  renderFsc(); const el=document.getElementById('quiz'); if(el) el.scrollIntoView({block:'start'});
+}
+function answer(k){
+  if(!QZ||QZ.shown&&QZ.mode!=='exam') return;
+  const q=QZ.qs[QZ.i]; const ok=k===q[4]; QZ.ans[QZ.i]=k;
+  const r=fscState().q[q[0]]||[0,0,0]; ok?r[0]++:r[1]++; r[2]=ok?1:0; fscState().q[q[0]]=r; quietSave();
+  if(QZ.mode==='exam'){ next(); } else { QZ.shown=true; renderFsc(); }
+}
+function next(){ QZ.i++; QZ.shown=false; if(QZ.i>=QZ.qs.length){ finishQuiz(); } else renderFsc(); }
+function finishQuiz(){
+  const score=QZ.qs.filter((q,i)=>QZ.ans[i]===q[4]).length;
+  if(QZ.mode==='exam'){ fscState().exams.push({d:TODAY,s:score,n:QZ.qs.length}); quietSave(); }
+  QZ.done=true; renderFsc();
+}
+
+function renderFsc(){
+  const v=document.getElementById('v-fsc'); const D=fscData(); const F=fscState();
+  const seen=Object.keys(F.q).length, mast=D.Q.filter(q=>mastered(q[0])).length;
+  const ex=F.exams.slice(-3); const best=F.exams.length?Math.max(...F.exams.map(e=>e.s)):null;
+  const ready = ex.length>=2 && ex.slice(-2).every(e=>e.s>=27);
+  const catStats=Object.keys(D.cats).map(k=>{const qs=D.Q.filter(q=>q[1]===k);const m=qs.filter(q=>mastered(q[0])).length;return {k,name:D.cats[k],n:qs.length,m};});
+  let quiz='';
+  if(QZ&&!QZ.done){
+    const q=QZ.qs[QZ.i]; const sh=QZ.shown;
+    quiz=`<section class="card" id="quiz"><div class="card-h"><h3>${QZ.mode==='exam'?'Mock exam':QZ.mode==='topic'?esc(D.cats[QZ.cat]):QZ.mode==='weak'?'Weak spots':'Practice'}</h3><span class="mini">Question ${QZ.i+1} of ${QZ.qs.length}</span></div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+        <span class="meter" style="margin:0"><i style="width:${QZ.i/QZ.qs.length*100}%"></i></span>
+        <span class="eyebrow">${esc(D.cats[q[1]])}${q[2].length&&q[3].length===2?' · True or false':''}</span>
+        <div style="font-size:17px;font-weight:600;line-height:1.4">${esc(q[2])}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${q[3].map((o,k)=>{let st='';if(sh){if(k===q[4])st='border-color:var(--ok);background:var(--ok-soft);color:var(--ok)';else if(k===QZ.ans[QZ.i])st='border-color:var(--no);background:var(--no-soft);color:var(--no)';}
+          return `<button class="btn qopt" data-k="${k}" style="text-align:left;padding:11px 14px;font-size:15px;${st}" ${sh?'disabled':''}><span class="mini" style="margin-right:8px">${'ABCD'[k]}</span>${esc(o)}</button>`}).join('')}</div>
+        ${sh?`<div class="callout ${QZ.ans[QZ.i]===q[4]?'':'hot'}"><span class="eyebrow">${QZ.ans[QZ.i]===q[4]?'Correct':'Not quite'}</span><p>${esc(q[5])}</p></div><button class="btn pri" id="qnext" style="align-self:flex-start">${QZ.i+1<QZ.qs.length?'Next question':'See results'}</button>`:''}
+        <button class="btn" id="qquit" style="align-self:flex-start;font-size:12px">Quit this round</button>
+      </div></section>`;
+  } else if(QZ&&QZ.done){
+    const score=QZ.qs.filter((q,i)=>QZ.ans[i]===q[4]).length; const n=QZ.qs.length; const pass=QZ.mode==='exam'?score>=23:score/n>=.77;
+    const wrong=QZ.qs.map((q,i)=>[q,QZ.ans[i]]).filter(x=>x[1]!==x[0][4]);
+    quiz=`<section class="card" id="quiz"><div class="card-h"><h3>${QZ.mode==='exam'?'Mock exam result':'Round result'}</h3><span class="pill ${pass?'p-ok':'p-no'}">${pass?'Pass':'Not yet'}</span></div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:var(--f-display);font-weight:800;font-size:54px;line-height:1">${score}<span class="mini" style="font-size:18px"> / ${n}</span></div>
+        <p class="lead" style="font-size:14.5px">${QZ.mode==='exam'?(score>=27?'Test-ready score. Two in a row at 27 or better and you\'re ready to book.':score>=23?'That passes the real test. Aim for 27+ so a bad day still passes.':'The real test needs 23. Drill your weak spots, then take another mock.'):'Missed questions go into Weak spots automatically.'}</p>
+        ${wrong.length?`<span class="eyebrow">Review what you missed</span>${wrong.map(([q,a])=>`<div class="zone" style="border:1px solid var(--line);border-radius:10px"><span class="zone-name">${esc(q[2])}</span><span></span><span class="zone-note"><span style="color:var(--no)">Your answer: ${a==null?'—':esc(q[3][a])}</span><br><span style="color:var(--ok)">Correct: ${esc(q[3][q[4]])}</span><br>${esc(q[5])}</span></div>`).join('')}`:''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-start="exam">New mock exam</button>${wrong.length?'<button class="btn" data-start="weak">Drill weak spots</button>':''}<button class="btn" id="qclose">Close</button></div>
+      </div></section>`;
+  }
+  v.innerHTML = `
+  <div class="hero" style="min-height:220px">${imgTag('papers','Application forms and a certificate on a desk')}
+    <div class="hero-in"><span class="eyebrow">Firearm Safety Certificate · ${D.Q.length} questions · 7 topics</span><h1 style="font-size:clamp(34px,6vw,54px)">Pass the FSC on the first try</h1>
+    <p>Study the seven topics, memorize the numbers, drill by topic, then take 30-question mock exams until you score 27 or better twice in a row.</p></div></div>
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">Readiness</span><span class="v" style="color:${ready?'var(--ok)':'inherit'}">${ready?'Ready':Math.round(mast/D.Q.length*100)+'%'}</span><span class="s">${ready?'Last two mocks 27+':'of questions mastered'}</span></div>
+    <div class="stat"><span class="eyebrow">Best mock</span><span class="v">${best==null?'—':best+'/30'}</span><span class="s">${F.exams.length} mock exam${F.exams.length===1?'':'s'} taken</span></div>
+    <div class="stat"><span class="eyebrow">Seen</span><span class="v">${seen}<span class="mini"> / ${D.Q.length}</span></span><span class="s">questions answered at least once</span></div>
+    <div class="stat"><span class="eyebrow">Real test</span><span class="v">23 / 30</span><span class="s">$25 · at the dealer · valid 5 years</span></div>
+  </div>
+  ${quiz}
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn pri" data-start="exam">Take a 30-question mock exam</button>
+    <button class="btn" data-start="practice">Quick 10</button>
+    <button class="btn" data-start="new">Unseen questions</button>
+    <button class="btn" data-start="weak">Weak spots</button>
+  </div>
+  ${F.exams.length?`<div class="bars" aria-label="Mock exam history"><span class="eyebrow">Mock exam history (pass line 23, target 27)</span>${F.exams.slice(-8).map(e=>`<div class="bar-row"><span class="lab">${fmtD(e.d)}</span><span class="trk"><span class="rng" style="left:${23/30*100}%;width:.4%;background:var(--ink)"></span><span class="spent" style="width:${e.s/30*100}%;background:${e.s>=27?'var(--ok)':e.s>=23?'var(--olive)':'var(--no)'}"></span></span><span class="num">${e.s}/30</span></div>`).join('')}</div>`:''}
+  <h2 class="sec">Key numbers to memorize</h2>
+  <div class="stats" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${D.nums.map(n=>`<div class="stat"><span class="v" style="font-size:24px">${esc(n[0])}</span><span class="s">${esc(n[1])}</span></div>`).join('')}</div>
+  <h2 class="sec">Study by topic</h2>
+  <div class="view" style="gap:10px">${D.chapters.map(c=>{const s=catStats.find(x=>x.k===c[0]);return `<div class="acc"><button class="acc-h" aria-expanded="false"><span>${esc(c[1])}</span><span style="display:flex;gap:8px;align-items:center"><span class="mini">${s.m}/${s.n} mastered</span>${chev}</span></button>
+    <div class="acc-b" hidden><p style="color:var(--muted)">${esc(c[2])}</p><ul>${c[3].map(b=>`<li>${esc(b)}</li>`).join('')}</ul><div><button class="btn pri" data-start="topic" data-cat="${c[0]}">Drill ${s.n} ${esc(c[1].toLowerCase())} questions</button></div></div></div>`}).join('')}</div>
+  <h2 class="sec">On test day</h2>
+  <div class="callout"><p>At WBT (or any dealer), the test is 30 multiple-choice and true/false questions. Bring your ID. If you miss, you can retake after 24 hours; ask the dealer whether the $25 covers the retake, since practice varies. Read every word: "always" and "never" answers are usually about the safety rules, and law questions turn on exact numbers.</p></div>
+  <p class="foot">Built from California Penal Code sections and standard firearm-safety doctrine; the official DOJ study guide (oag.ca.gov) couldn't be read from here, so skim it once before the test. Recent laws (PC 25145 storage, 2026) may appear differently or not at all on the real test. Confidence: high on the safety rules and the key numbers; moderate on the exact wording the DOJ uses.</p>`;
+  v.querySelectorAll('[data-start]').forEach(b=>b.addEventListener('click',()=>startQuiz(b.dataset.start,b.dataset.cat)));
+  v.querySelectorAll('.qopt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.k)));
+  const nx=v.querySelector('#qnext'); if(nx) nx.addEventListener('click',next);
+  const qq=v.querySelector('#qquit'); if(qq) qq.addEventListener('click',()=>{QZ=null;renderFsc();});
+  const qc=v.querySelector('#qclose'); if(qc) qc.addEventListener('click',()=>{QZ=null;renderFsc();});
+  v.querySelectorAll('.acc-h').forEach(b=>b.addEventListener('click',()=>{const a=b.parentElement;const o=!a.classList.contains('open');a.classList.toggle('open',o);b.setAttribute('aria-expanded',o);a.querySelector('.acc-b').hidden=!o;}));
 }
 </script>
